@@ -1,21 +1,115 @@
+@import url("https://fonts.googleapis.com/css2?family=Arial:wght@400;700&family=Courier+Prime&family=Georgia:wght@400;700&family=Times+New+Roman:wght@400;700&family=Verdana:wght@400;700&family=Tahoma:wght@400;700&family=Trebuchet+MS:wght@400;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Add this to your globals.css or a similar file */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-satoshi: "Satoshi", sans-serif;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Satoshi", sans-serif;
+  background-color: #fffbf0;
 }
+
+@layer utilities {
+  .shiny-border {
+    position: relative;
+    padding: 2px; /* Adjust to control the border thickness */
+    border-radius: 9999px; /* Fully rounded border */
+    overflow: hidden;
+  }
+
+  .shiny-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px; /* Match the border thickness */
+    background: linear-gradient(
+      120deg,
+      #edc531,
+      rgba(255, 255, 255, 0.8),
+      #edc531
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    /* Set a static shine effect */
+    animation: none; /* Remove animation */
+  }
+
+  .shiny-border-content {
+    position: relative;
+    background-color: #fffbf0; /* Set your background color */
+    z-index: 1;
+    padding: 8px 16px; /* Inner padding */
+    border-radius: inherit;
+  }
+}
+
+/* Tailwind CSS or global.css */
+
+/* Editor content styling */
+.editor-content .ql-editor {
+  @apply text-base font-arial; /* Only applies within .editor-content */
+}
+
+/* Preview content styling */
+.preview-content {
+  @apply text-base font-arial; /* Only applies within .preview-content */
+}
+
+.preview-content h1 {
+  @apply text-3xl font-bold; /* Heading 1 styles */
+}
+
+.preview-content h2 {
+  @apply text-2xl font-semibold; /* Heading 2 styles */
+}
+
+.preview-content h3 {
+  @apply text-xl font-medium; /* Heading 3 styles */
+}
+
+.preview-content p {
+  @apply mb-4; /* Paragraph margin */
+}
+
+.preview-content blockquote {
+  @apply border-l-4 pl-4 italic text-gray-700; /* Blockquote styles */
+}
+
+.preview-content code {
+  @apply bg-gray-100 p-1 rounded; /* Inline code styles */
+}
+
+.preview-content pre {
+  @apply bg-gray-200 p-2 rounded overflow-x-auto; /* Code block styles */
+}
+
+.preview-content ul {
+  @apply list-disc list-inside mb-4; /* Unordered list styles */
+}
+
+.preview-content ol {
+  @apply list-decimal list-inside mb-4; /* Ordered list styles */
+}
+
+.preview-content li {
+  @apply mb-1; /* List item margin */
+}
+
+/* Additional custom styles if needed */
+.preview-content a {
+  @apply text-blue-600 hover:underline; /* Link styles */
+}
+
+.preview-content img {
+  @apply max-w-full h-auto; /* Responsive image styles */
+}
+
+/* Add more styles for other formats as needed */
