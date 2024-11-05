@@ -1,17 +1,17 @@
+"use client";
+import { useParams } from "next/navigation";
 import getArticleById from "@/app/actions/getArticlesById";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import ArticleClient from "../ArticleClient";
 
-interface IParams {
-  id?: string;
-}
-
-const ArticlePage = async ({ params }: { params: { id: string } }) => {
-  const article = await getArticleById({ articleId: params.id });
+const ArticlePage = async () => {
+  const params = useParams();
+  const articleId = Array.isArray(params?.id) ? params.id[0] : params?.id; // Ensure articleId is a string or undefined
+  const article = await getArticleById({ articleId });
   const currentUser = await getCurrentUser();
 
   if (!article) {
-    return <div>No article</div>;
+    return <div>No article found</div>;
   }
 
   return (

@@ -1,11 +1,13 @@
 // app/articles/page.tsx
+"use client";
 import getCurrentUser from "@/app/actions/getCurrentUser";
-import getArticles, { IArticleParams } from "@/app/actions/getArticles";
+import getArticles from "@/app/actions/getArticles";
 import ArticlesPageWrapper from "../_components/ArticlesPageWrapper";
 import { SafeArticle } from "@/types";
 
-const ArticlesPage = async ({ params }: { params: IArticleParams }) => {
-  const articlesData: SafeArticle[] = await getArticles(params); // Explicitly typed as SafeArticle[]
+const ArticlesPage = async () => {
+  // Pass an empty object if there are no specific params for filtering articles
+  const articlesData: SafeArticle[] = await getArticles({});
   const currentUser = await getCurrentUser();
 
   if (!articlesData || articlesData.length === 0) {

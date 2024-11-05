@@ -87,7 +87,7 @@ export async function POST(request: Request) {
         paypalSubscriptionId: "", // Placeholder until the actual ID is available
         planType,
         startDate: new Date(),
-        status: "active",
+        status: "ACTIVE",
         nextPaymentDate:
           frequency === "MONTH"
             ? new Date(new Date().setMonth(new Date().getMonth() + 1))

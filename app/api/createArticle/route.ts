@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       datePublished: datePublished ? new Date(datePublished) : undefined,
       minutesRead,
       content,
-      references,
+
       userId,
     },
   });
