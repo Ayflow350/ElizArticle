@@ -5,6 +5,7 @@ import PaypalSubscriptionButton from "@/app/components/PaypalSubscriptionButton"
 import { twMerge } from "tailwind-merge";
 import { FcCheckmark } from "react-icons/fc";
 import getCurrentUser from "@/app/actions/getCurrentUser";
+export const dynamic = "force-dynamic";
 
 interface PricingTier {
   title: string;
