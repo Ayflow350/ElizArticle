@@ -12,7 +12,6 @@ export const authOptions: AuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
-
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -20,67 +19,57 @@ export const authOptions: AuthOptions = {
         password: { label: "password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("Authorization started...");
-        console.log("Credentials provided:", credentials);
-
         if (!credentials?.email || !credentials?.password) {
-          console.log("Invalid credentials provided.");
           throw new Error("Invalid credentials");
         }
-
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
+          where: { email: credentials.email },
         });
-
-        console.log("User fetched from database:", user);
-
-        if (!user || !user?.hashedPassword) {
-          console.log("Invalid user or missing hashed password.");
+        if (!user || !user.hashedPassword) {
           throw new Error("Invalid credentials");
         }
-
         const isCorrectPassword = await bcrypt.compare(
           credentials.password,
           user.hashedPassword
         );
-
-        console.log("Password comparison result:", isCorrectPassword);
-
         if (!isCorrectPassword) {
-          console.log("Incorrect password.");
           throw new Error("Invalid credentials");
         }
-
-        console.log("Authorization successful. User:", user);
-
-        // Return user with role
         return {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role, // Ensure role is included in the returned user object
+          role: user.role,
         };
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/",
-  },
+  session: { strategy: "jwt" },
+  pages: { signIn: "/" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role; // Ensure user role is part of the JWT
+        token.id = user.id; // Ensures user ID is always in JWT
+        token.role = user.role; // Ensures role is available in JWT
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.role = token.role as string; // Explicitly cast to string
+      if (token) {
+        session.user.id = token.id as string; // Explicitly add user ID to session
+        session.user.role = token.role as string; // Explicitly add role to session
+      }
       return session;
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production", // Secure in production
+      },
     },
   },
   debug: process.env.NODE_ENV === "development",
