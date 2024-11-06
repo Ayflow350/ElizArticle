@@ -43,24 +43,6 @@ const LoginModal = () => {
     setIsLoading(true);
 
     console.log(data); // This will log the data submitted by the user
-
-    axios
-      .post("/api/forgotPassword", data)
-      .then((response) => {
-        console.log("done", response); // Log the response for debugging
-        toast.success(
-          "Check your email for instructions to reset your password."
-        );
-        forgotModal.onClose();
-        verifyModal.onOpen();
-      })
-      .catch((error) => {
-        console.error("Error:", error); // Log the error for debugging
-        toast.error("Something went wrong. Please try again."); // Show error toast
-      })
-      .finally(() => {
-        setIsLoading(false); // Reset loading state
-      });
   };
 
   const bodyContent = (
