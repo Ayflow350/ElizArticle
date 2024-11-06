@@ -1,4 +1,4 @@
-import prisma from "@/app/libs/prismadb"; // Adjust based on your actual directory structure
+import prisma from "@/app/libs/prismadb";
 import { SafeArticle } from "@/types";
 
 export interface IArticleParams {
@@ -10,12 +10,16 @@ export interface IArticleParams {
   minReadTime?: number;
 }
 
-// Utility to format date as YYYY-MM-DD
 const formatDate = (date: Date): string => date.toISOString().split("T")[0];
 
 export default async function getArticles(
   params: IArticleParams
 ): Promise<SafeArticle[]> {
+  // Check if we're on the server
+  if (typeof window !== "undefined") {
+    throw new Error("getArticles should only be called on the server side");
+  }
+
   const { userId, category, title, datePublished, author, minReadTime } =
     params;
 
@@ -44,7 +48,7 @@ export default async function getArticles(
       datePublished: formatDate(article.datePublished),
       minutesRead: article.minutesRead,
       userId: article.userId,
-      picture: article.picture, // Now guaranteed to be non-nullable
+      picture: article.picture,
       user: article.user
         ? {
             id: article.user.id,
@@ -53,15 +57,12 @@ export default async function getArticles(
             image: article.user.image,
             emailVerified: article.user.emailVerified
               ? article.user.emailVerified.toISOString()
-              : null, // Convert Date to string
+              : null,
           }
         : null,
     }));
   } catch (error) {
-    if (error instanceof Error) {
-      console.error("Prisma error in getArticles:", error.message);
-      throw new Error(error.message || "Error fetching articles");
-    }
-    throw new Error("An unknown error occurred while fetching articles");
+    console.error("Prisma error in getArticles:", error);
+    throw new Error("Error fetching articles");
   }
 }

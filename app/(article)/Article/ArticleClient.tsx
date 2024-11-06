@@ -8,13 +8,10 @@ export const dynamic = "force-dynamic";
 
 interface ArticleClientProps {
   article: SafeArticle;
-  currentUser: any; // Adjust this type based on your current user data structure
+  // Adjust this type based on your current user data structure
 }
 
-const ArticleClient: React.FC<ArticleClientProps> = ({
-  article,
-  currentUser,
-}) => {
+const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
   return (
     <Container>
       <h1 className="text-5xl font-bold mb-4">{article.title}</h1>
