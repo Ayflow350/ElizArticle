@@ -3,6 +3,9 @@ import { useState } from "react";
 import { useQuery } from "react-query";
 import axios from "axios";
 import Link from "next/link";
+export const dynamic = "force-dynamic";
+
+export const dynamicParams = true;
 
 interface Article {
   id: string;

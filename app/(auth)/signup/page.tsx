@@ -1,5 +1,4 @@
 "use client";
-import Header from "@/app/components/Header";
 import Image from "next/image";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -9,7 +8,10 @@ import Container from "@/app/components/Container";
 import { useCallback, useState } from "react";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import Input from "../../components/inputs/input";
+
 export const dynamic = "force-dynamic";
+
+export const dynamicParams = true;
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 

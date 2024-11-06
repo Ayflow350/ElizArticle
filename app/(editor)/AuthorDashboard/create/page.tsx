@@ -9,6 +9,9 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Button from "@/app/components/Button";
 import Container from "@/app/components/Container";
 import ImageUpload from "../_components/imageUpload";
+export const dynamic = "force-dynamic";
+
+export const dynamicParams = true;
 
 const ArticleForm = () => {
   const [isLoading, setIsLoading] = useState(false);
