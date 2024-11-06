@@ -31,7 +31,8 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
     amount,
     currency
   );
-  // This function sends subscription details to your backend after approval
+
+  // Function to send subscription details to the server after approval
   const sendSubscriptionDetailsToServer = async (details: any) => {
     try {
       const response = await fetch("/api/createPlan", {
@@ -46,7 +47,7 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
           description,
           amount,
           currency,
-          subscriptionId: details.id, // Use the subscription ID captured from PayPal
+          paypalSubscriptionId: details.id, // Use the subscription ID captured from PayPal
         }),
       });
 
@@ -59,13 +60,15 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
       console.error("Error sending subscription details to server:", error);
     }
   };
+
+  // Handle approval and send details to the server
   const handleApprove = async (data: any, actions: any) => {
     try {
       const details = await actions.subscription.get();
       console.log("Subscription successful for:", details.id);
-      // to do for invoice generation
-      // Send userId and subscription ID to the server after successful approval
-      // await sendSubscriptionDetailsToServer( details.id); // Pass both userId and subscription ID
+
+      // Send subscription details to server with the captured subscription ID
+      await sendSubscriptionDetailsToServer(details);
 
       // Show success message and redirect
       alert("Subscription successful! Redirecting to the home page...");

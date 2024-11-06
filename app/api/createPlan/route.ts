@@ -5,10 +5,14 @@ import { getPayPalAccessToken } from "@/app/libs/paypal";
 import prisma from "@/app/libs/prismadb";
 
 export async function POST(request: Request) {
-  console.log("Starting PayPal plan creation..."); // Step 1: Check if the function is invoked
+  // Manual logging to simulate morgan
+  console.log(`${request.method} ${request.url}`);
+
+  const body = await request.json();
+  console.log("Request Body:", body);
 
   const accessToken = await getPayPalAccessToken();
-  console.log("Access Token:", accessToken); // Step 2: Log the access token
+  console.log("Access Token:", accessToken);
 
   if (!accessToken) {
     console.error("Failed to get PayPal access token");
@@ -18,16 +22,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const body = await request.json();
   const { userId, planType, name, description, amount, currency } = body;
-  console.log("Request Body:", body); // Step 3: Log request payload
-
   const frequency = planType === "monthly" ? "MONTH" : "YEAR";
   const intervalCount = 1;
 
   try {
     // Create PayPal plan
-    console.log("Attempting to create PayPal plan...");
     const response = await fetch(`${process.env.PAYPAL_API}/v1/billing/plans`, {
       method: "POST",
       headers: {
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        product_id: "PROD-2621363682433132H", // Replace with a valid PayPal product ID
+        product_id: "PROD-2621363682433132H",
         name,
         description,
         billing_cycles: [
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
             },
             tenure_type: "REGULAR",
             sequence: 1,
-            total_cycles: 0, // 0 for indefinite recurrence
+            total_cycles: 0,
             pricing_scheme: {
               fixed_price: {
                 value: amount,
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     });
 
     const planData = await response.json();
-    console.log("PayPal Plan Response:", planData); // Step 4: Log the PayPal API response
+    console.log("PayPal Plan Response:", planData);
 
     if (!response.ok) {
       console.error("Error creating PayPal plan:", planData);
@@ -75,18 +75,18 @@ export async function POST(request: Request) {
     }
 
     // Save the created plan to the database
-    console.log("Saving subscription to the database...");
     const newSubscription = await prisma.subscription.create({
       data: {
         user: {
           connect: {
-            id: userId, // Assuming `userId` is the correct user ID passed to this function
+            id: userId,
           },
         },
-        paypalPlanId: planData.id, // PayPal's plan ID
-        paypalSubscriptionId: "", // Placeholder until the actual ID is available
+        paypalPlanId: planData.id,
+        paypalSubscriptionId: "",
         planType,
         startDate: new Date(),
+        endDate: null,
         status: "ACTIVE",
         nextPaymentDate:
           frequency === "MONTH"
@@ -94,12 +94,11 @@ export async function POST(request: Request) {
             : new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
         lastPaymentDate: null,
         autoRenew: true,
-
-        invoices: { create: [] }, // Empty for now
+        invoices: { create: [] },
       },
     });
 
-    console.log("Subscription created successfully:", newSubscription); // Step 5: Log successful database save
+    console.log("Subscription created successfully:", newSubscription);
     return NextResponse.json(newSubscription);
   } catch (error) {
     console.error("Error during PayPal plan creation process:", error);

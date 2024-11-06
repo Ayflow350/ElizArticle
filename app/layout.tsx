@@ -12,13 +12,7 @@ import ToasterProvider from "./providers/ToastProvider";
 import getCurrentUser from "./actions/getCurrentUser";
 
 import ClientPayPalProvider from "@/app/providers/ClientPayPalProvider";
-
-// Import Poppins from Google Fonts
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500"],
-});
+import Footer from "./components/Footer";
 
 // Import Satoshi as a local font
 const satoshi = localFont({
@@ -64,6 +58,7 @@ export default async function RootLayout({
         <VerifyModal />
         <Header currentUser={currentUser} />
         <ClientPayPalProvider>{children}</ClientPayPalProvider>
+        <Footer />
       </body>
     </html>
   );
