@@ -122,7 +122,7 @@ const SignUp = () => {
         </div>
 
         {/* picture */}
-        <div className="flex-1">
+        <div className="flex-1 hidden lg:flex">
           <Image src={Banner} className="" alt="Banner" />
         </div>
       </div>

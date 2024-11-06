@@ -1,3 +1,4 @@
+// Use this as a Server Component (No need for "use client")
 import React from "react";
 import Container from "@/app/components/Container";
 import PaypalSubscriptionButton from "@/app/components/PaypalSubscriptionButton";
@@ -168,4 +169,3 @@ const PaymentPage = async () => {
 };
 
 export default PaymentPage;
-
