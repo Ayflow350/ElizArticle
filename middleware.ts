@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import prisma from "@/app/libs/prismadb";
+import prisma from "@/app/libs/prismadb"; // Import Prisma client
 
 // Custom logging function
 function logRequestDetails(request: NextRequest, message: string) {
@@ -19,31 +19,33 @@ export async function middleware(request: NextRequest) {
   const sessionTokenCookie = request.cookies.get("next-auth.session-token");
   const userCookie = request.cookies.get("next-auth.user");
 
+  // Check authentication status
   const isAuthenticated = sessionTokenCookie ? sessionTokenCookie.value : null;
   let userRole = null;
   let isSubscriber = false;
 
   if (userCookie) {
     try {
+      // Parse user cookie
       const userData = JSON.parse(userCookie.value);
       userRole = userData.role;
+
       logRequestDetails(request, `User role: ${userRole}`);
 
       if (isAuthenticated && userData.id) {
         const userId = userData.id;
-        console.log("Middleware user ID:", userId);
+        logRequestDetails(request, `Authenticated user ID: ${userId}`);
 
-        // Check active subscriptions
+        // Query active subscriptions only if the user is authenticated
         const subscriptions = await prisma.subscription.findMany({
           where: { userId, status: "ACTIVE" },
         });
+
         logRequestDetails(
           request,
-          `Active subscriptions: ${subscriptions.length}`
+          `Active subscriptions count: ${subscriptions.length}`
         );
         isSubscriber = subscriptions.length > 0;
-      } else {
-        console.warn("User is not authenticated or missing user ID.");
       }
     } catch (error) {
       console.error(
@@ -53,23 +55,21 @@ export async function middleware(request: NextRequest) {
       userRole = null;
       isSubscriber = false;
     }
-  } else {
-    logRequestDetails(request, "User cookie not found");
   }
 
   const url = request.nextUrl.clone();
 
-  if (!isAuthenticated) {
-    if (url.pathname !== "/" && url.pathname !== "/signup") {
-      logRequestDetails(
-        request,
-        "Redirecting unauthenticated user to signup page"
-      );
-      url.pathname = "/signup";
-      return NextResponse.redirect(url);
-    }
+  // Redirect unauthenticated users to signup
+  if (!isAuthenticated && url.pathname !== "/" && url.pathname !== "/signup") {
+    logRequestDetails(
+      request,
+      "Redirecting unauthenticated user to signup page"
+    );
+    url.pathname = "/signup";
+    return NextResponse.redirect(url);
   }
 
+  // Prevent authenticated users from accessing the login page
   if (isAuthenticated && url.pathname === "/login") {
     if (userRole === "ADMIN") {
       logRequestDetails(request, "Redirecting ADMIN user to /admin page");
@@ -78,6 +78,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Restrict non-admins from accessing admin-specific routes
   if (url.pathname.startsWith("/AuthorDashboard") && userRole !== "ADMIN") {
     logRequestDetails(
       request,
@@ -87,6 +88,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Restrict non-subscribers from accessing subscriber-only content
   if (url.pathname.startsWith("/Article") && !isSubscriber) {
     logRequestDetails(
       request,
@@ -96,11 +98,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  logRequestDetails(request, "Proceeding with the request");
+  logRequestDetails(request, "Request passed all checks, proceeding");
   return NextResponse.next();
 }
 
-// Middleware config to exclude specific paths
+// Config to exclude specific paths from middleware
 export const config = {
   matcher: ["/((?!login|signup|public|api|_next/static|_next/image).*)"],
 };
