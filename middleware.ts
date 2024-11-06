@@ -94,7 +94,7 @@ export async function middleware(request: NextRequest) {
       request,
       "Non-subscriber attempting to access /Article, redirecting to /Payment"
     );
-    url.pathname = "/Payment";
+    url.pathname = "https://eliz-article-k6zq.vercel.app/Payment";
     return NextResponse.redirect(url);
   }
 
