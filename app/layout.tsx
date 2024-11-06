@@ -58,7 +58,7 @@ export default async function RootLayout({
         <VerifyModal />
         <Header currentUser={currentUser} />
         <ClientPayPalProvider>{children}</ClientPayPalProvider>
-        <Footer />
+        {/* <Footer /> */}
       </body>
     </html>
   );

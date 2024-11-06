@@ -2,11 +2,11 @@
 
 import Logo from "@/assets/blocklogo.svg";
 import Image from "next/image";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Container from "./Container";
 import { SafeUser } from "@/types/index";
-import { usePathname } from "next/navigation";
+import { usePathname } from "next/navigation"; // Import usePathname
 import { MdMenu } from "react-icons/md";
 import NavMobile from "./NavMobile";
 
@@ -15,17 +15,10 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ currentUser }) => {
-  const pathname = usePathname();
+  const pathname = usePathname(); // Get the current pathname
 
-  // State for controlling mobile nav visibility
-  const [navMobile, setNavMobile] = useState(false);
-
-  // Toggle mobile navigation
-  const toggleNavMobile = useCallback(() => {
-    setNavMobile((prev) => !prev);
-  }, []);
-
-  // Define navigation links for regular users
+  // console.log("Current pathname:", pathname); // Log the pathname for debugging
+  const [navMobile, setNavMobile] = useState(true);
   const defaultNavLinks = (
     <>
       <Link href="/">Home</Link>
@@ -36,7 +29,6 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
     </>
   );
 
-  // Define navigation links for editor dashboard
   const editorDashboardNavLinks = (
     <>
       <Link href="/EditorDashboard/overview">Overview</Link>
@@ -47,20 +39,19 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
   );
 
   return (
-    <div className="border-b pb-5 border-[#EDE8D9]">
+    <div className="border-b  pb-5 border-[#EDE8D9]">
       <Container>
-        <div className="flex pt-4 md:pt-5 items-center justify-between">
-          {/* Logo */}
+        <div className="flex pt-4 md:pt-5 items-center text-center justify-between">
           <div>
             <Image src={Logo} alt="eliz bright logo" className="w-[120px]" />
           </div>
-          {/* Desktop Navigation Links */}
           <div className="hidden md:flex lg:flex items-center gap-x-3">
             <nav className="flex items-center gap-x-8 font-normal text-base text-[#22221F] leading-[26px]">
-              {pathname?.startsWith("/EditorDashboard")
+              {pathname?.startsWith("/AuthorDashboard")
                 ? editorDashboardNavLinks
                 : defaultNavLinks}
             </nav>
+
             <div className="flex items-center gap-x-3">
               <div className="border-l border-[#22221F] h-3"></div>
               <button className="font-medium text-base text-[#22221F] bg-[#ffe146] py-3 px-6 rounded-full">
@@ -68,15 +59,15 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
               </button>
             </div>
           </div>
-          {/* Mobile Menu Icon */}
-          <div className="flex md:hidden" onClick={toggleNavMobile}>
+          <div className="flex md:hidden " onClick={() => setNavMobile(true)}>
             <MdMenu className="text-2xl" />
           </div>
-          {/* Mobile Navigation */}
+
           <div
-            className={`${
-              navMobile ? "right-0" : "-right-full"
-            } fixed z-10 top-0 left-0 h-full w-full bg-white transition-all duration-200`}
+            className={`${navMobile ? "right-0" : "-right-full"}
+        fixed z-10 top-0 h-full transition-all duration-200`}
+
+            // className="fixed z-10 top-0 h-full transition-all duration-200"
           >
             <NavMobile setNavMobile={setNavMobile} />
           </div>
