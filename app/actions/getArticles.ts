@@ -1,5 +1,4 @@
-// lib/prismadb.ts
-import prisma from "../libs/prismadb";
+import prisma from "@/app/libs/prismadb"; // Adjust based on your actual directory structure
 import { SafeArticle } from "@/types";
 
 export interface IArticleParams {
@@ -59,8 +58,8 @@ export default async function getArticles(
         : null,
     }));
   } catch (error) {
-    // Safely handle the unknown type for error
     if (error instanceof Error) {
+      console.error("Prisma error in getArticles:", error.message);
       throw new Error(error.message || "Error fetching articles");
     }
     throw new Error("An unknown error occurred while fetching articles");
