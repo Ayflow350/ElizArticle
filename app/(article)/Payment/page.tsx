@@ -18,24 +18,7 @@ interface PricingTier {
 }
 
 const PaymentPage = async () => {
-  const currentUser = await getCurrentUser();
-
   // Redirect to login or show a message if the user is not authenticated
-  if (!currentUser) {
-    return (
-      <Container>
-        <h2 className="mt-5 mb-2 text-center text-3xl font-bold">
-          You need to be logged in to access this page.
-        </h2>
-        <p className="text-center text-lg">
-          Please log in to view pricing plans.
-        </p>
-        <a href="/login" className="text-blue-500 underline">
-          Go to Login
-        </a>
-      </Container>
-    );
-  }
 
   const pricingTiers: PricingTier[] = [
     {
@@ -137,14 +120,14 @@ const PaymentPage = async () => {
                   /{duration}
                 </span>
               </div>
-              <PaypalSubscriptionButton
+              {/* <PaypalSubscriptionButton
                 userId={currentUser.id}
                 planType="monthly" // or "yearly" based on your preference
                 name="Premium Subscription"
                 description="Access to premium features"
                 amount="24.00" // Adjust the amount as needed
                 currency="USD"
-              />
+              /> */}
               <ul className="flex flex-col gap-5 mt-8">
                 {features.map((feature) => (
                   <li key={feature} className="text-sm flex items-center gap-4">
