@@ -9,6 +9,7 @@ import Container from "@/app/components/Container";
 import { useCallback, useState } from "react";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import Input from "../../components/inputs/input";
+export const dynamic = "force-dynamic";
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 

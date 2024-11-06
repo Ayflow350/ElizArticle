@@ -1,6 +1,7 @@
 // components/ArticleCard.tsx
 import Link from "next/link";
 import { MdArrowOutward } from "react-icons/md";
+export const dynamic = "force-dynamic";
 
 interface Article {
   id: string;

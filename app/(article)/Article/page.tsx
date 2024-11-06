@@ -4,6 +4,7 @@ import getCurrentUser from "@/app/actions/getCurrentUser";
 import getArticles from "@/app/actions/getArticles";
 import ArticlesPageWrapper from "../_components/ArticlesPageWrapper";
 import { SafeArticle } from "@/types";
+export const dynamic = "force-dynamic";
 
 const ArticlesPage = async () => {
   // Pass an empty object if there are no specific params for filtering articles

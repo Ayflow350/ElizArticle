@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useQuery, QueryClient, QueryClientProvider } from "react-query";
 import Container from "@/app/components/Container";
 import ArticleCard from "./ArticleCard"; // Import the ArticleCard component
+export const dynamic = "force-dynamic";
 
 interface Article {
   id: string;
