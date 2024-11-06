@@ -8,7 +8,6 @@ import { SafeArticle } from "@/types";
 const ArticlesPage = async () => {
   // Pass an empty object if there are no specific params for filtering articles
   const articlesData: SafeArticle[] = await getArticles({});
-  const currentUser = await getCurrentUser();
 
   if (!articlesData || articlesData.length === 0) {
     return <div>No articles</div>;

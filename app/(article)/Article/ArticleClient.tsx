@@ -4,6 +4,7 @@ import { SafeArticle } from "@/types/index"; // Import your SafeArticle type
 import React from "react";
 import Image from "next/image";
 import Container from "@/app/components/Container";
+export const dynamic = "force-dynamic";
 
 interface ArticleClientProps {
   article: SafeArticle;

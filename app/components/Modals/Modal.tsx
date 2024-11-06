@@ -5,6 +5,7 @@ import { IoMdClose } from "react-icons/io";
 import Image from "next/image";
 import modalLogo from "@/assets/modal-logo.png";
 import Button from "../Button";
+export const dynamic = "force-dynamic";
 
 interface ModalProps {
   isOpen?: boolean;

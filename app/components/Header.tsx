@@ -9,6 +9,7 @@ import { SafeUser } from "@/types/index";
 import { usePathname } from "next/navigation"; // Import usePathname
 import { MdMenu } from "react-icons/md";
 import NavMobile from "./NavMobile";
+export const dynamic = "force-dynamic";
 
 interface HeaderProps {
   currentUser?: SafeUser | null;
