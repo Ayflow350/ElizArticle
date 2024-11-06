@@ -66,7 +66,7 @@ export async function middleware(request: NextRequest) {
     const isProtectedRoute =
       !url.pathname.startsWith("/login") &&
       !url.pathname.startsWith("/signup") &&
-      !url.pathname.startsWith("/public");
+      !url.pathname.startsWith("/payment");
 
     if (isProtectedRoute) {
       logRequestDetails(
