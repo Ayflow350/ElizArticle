@@ -1,12 +1,9 @@
-"use client";
-import { useParams } from "next/navigation";
-import getArticleById from "@/app/actions/getArticlesById";
+// app/articles/[id]/page.tsx (server component)
+import getArticleById from "@/app/actions/getArticlesById"; // Ensure this function runs server-side
+import ArticleClient from "../ArticleClient"; // Adjust path if needed
 
-import ArticleClient from "../ArticleClient";
-
-const ArticlePage = async () => {
-  const params = useParams();
-  const articleId = Array.isArray(params?.id) ? params.id[0] : params?.id; // Ensure articleId is a string or undefined
+const ArticlePage = async ({ params }: { params: { id: string } }) => {
+  const articleId = params.id; // params.id will be a string, since it's from dynamic route
   const article = await getArticleById({ articleId });
 
   if (!article) {
