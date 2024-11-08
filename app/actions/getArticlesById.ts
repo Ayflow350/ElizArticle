@@ -3,10 +3,9 @@ import prisma from "../libs/prismadb"; // Adjust the import path as necessary
 import { SafeArticle } from "../../types/index"; // Import the SafeArticle type
 
 interface IParams {
-  articleId?: string; // Use 'articleId' for clarity
+  articleId?: string;
 }
 
-// app/actions/getArticleById.ts
 export default async function getArticleById(
   params: IParams
 ): Promise<SafeArticle | null> {
@@ -22,8 +21,6 @@ export default async function getArticleById(
       },
     });
 
-    console.log("Fetched article:", article); // Log the fetched article
-
     if (!article) {
       return null;
     }
@@ -31,6 +28,8 @@ export default async function getArticleById(
     return {
       ...article,
       datePublished: article.datePublished.toISOString(),
+
+      userId: article.userId || null, // Ensuring nullable userId
       user: article.user
         ? {
             ...article.user,

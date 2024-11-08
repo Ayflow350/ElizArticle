@@ -11,6 +11,7 @@ interface PaypalSubscriptionButtonProps {
   description: string;
   amount: string;
   currency: string;
+  planId: string;
 }
 
 const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
@@ -20,6 +21,7 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
   description,
   amount,
   currency,
+  planId,
 }) => {
   console.log(
     "userId",
@@ -95,7 +97,7 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
         <PayPalButtons
           createSubscription={(data, actions) => {
             return actions.subscription.create({
-              plan_id: "P-12V23304WY318440JM4UGEVI", // Replace with your actual PayPal subscription plan ID
+              plan_id: planId, // Replace with your actual PayPal subscription plan ID
             });
           }}
           onApprove={handleApprove}

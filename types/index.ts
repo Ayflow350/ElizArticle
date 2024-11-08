@@ -9,13 +9,13 @@ export type SafeUser = Omit<
   updatedAt: string;
   emailVerified: string | null;
 };
-
 // Assuming this is in your types/index.ts or equivalent file
 export type SafeArticle = Omit<
   Article,
   "userId" | "createdAt" | "updatedAt" | "datePublished"
 > & {
-  datePublished: string; // Change this to string if you want to format it as an ISO string
+  datePublished: string; // Format datePublished as a string
+  // Add references here
   user: {
     id: string;
     name: string | null;

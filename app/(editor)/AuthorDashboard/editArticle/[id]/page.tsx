@@ -1,7 +1,7 @@
 import getArticleById from "@/app/actions/getArticlesById";
-import ArticleClient from "../ArticleClient";
+import EditArticleClient from "../editArticleClient";
 
-const ArticlePage = async ({ params }: { params: { id: string } }) => {
+const EditArticle = async ({ params }: { params: { id: string } }) => {
   const articleId = params.id;
   const article = await getArticleById({ articleId });
 
@@ -11,9 +11,9 @@ const ArticlePage = async ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="mt-[100px]">
-      <ArticleClient article={article} />
+      <EditArticleClient article={article} />
     </div>
   );
 };
 
-export default ArticlePage;
+export default EditArticle;

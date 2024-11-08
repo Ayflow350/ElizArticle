@@ -18,6 +18,7 @@ export interface SafeArticle {
   datePublished: string;
   minutesRead: number;
   content: string;
+  references: string | null;
   userId: string | null; // Remains nullable if the article doesn’t always have an associated user
   user?: User | null; // Optional user object for populated details
 }

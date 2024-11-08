@@ -7,14 +7,10 @@ import { QueryClient, QueryClientProvider } from "react-query";
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient();
   return (
-    <div className="h-full">
+    <div className="mt-[100px]">
       {/* <Sidebar /> */}
 
-      <div className="md:pl-56 pt-[80px] h-full">
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
-      </div>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </div>
   );
 };

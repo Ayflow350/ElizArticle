@@ -1,5 +1,3 @@
-// pages/api/paypal/create-plan.ts
-
 import { NextResponse } from "next/server";
 import { getPayPalAccessToken } from "@/app/libs/paypal";
 import prisma from "@/app/libs/prismadb";
@@ -99,6 +97,19 @@ export async function POST(request: Request) {
     });
 
     console.log("Subscription created successfully:", newSubscription);
+
+    // Update user's hasActiveSubscription to true
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        hasActiveSubscription: true,
+      },
+    });
+
+    console.log("User subscription status updated:", updatedUser);
+
     return NextResponse.json(newSubscription);
   } catch (error) {
     console.error("Error during PayPal plan creation process:", error);

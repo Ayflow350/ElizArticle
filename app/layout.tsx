@@ -50,7 +50,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${satoshi.variable}`}>
+      <body className={`${satoshi.variable} overflow-x-hidden`}>
         <ToasterProvider />
 
         <LoginModal />

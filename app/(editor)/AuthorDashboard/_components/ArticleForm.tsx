@@ -1,57 +1,88 @@
+// ArticleForm.tsx
+
 "use client";
 
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "@/app/components/inputs/article";
 import toast, { Toaster } from "react-hot-toast";
-import Editor from "../_components/editor";
+import Editor from "./editor";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Button from "@/app/components/Button";
 import Container from "@/app/components/Container";
-import ImageUpload from "../_components/imageUpload";
-export const dynamic = "force-dynamic";
+import ImageUpload from "./imageUpload";
 
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
-const ArticleForm = () => {
+interface ArticleFormProps {
+  article?: {
+    id: string;
+    title: string;
+    category: string;
+    author: string;
+    minutesRead: number;
+    picture: string;
+    content: string;
+    references: string;
+    datePublished: Date;
+  };
+}
+
+const ArticleForm: React.FC<ArticleFormProps> = ({ article }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [introContent, setIntroContent] = useState("");
-  const [mainContent, setMainContent] = useState("");
+  const [introContent, setIntroContent] = useState(
+    article ? article.content : ""
+  );
+  const [mainContent, setMainContent] = useState(
+    article ? article.references : ""
+  );
 
   const {
     register,
     handleSubmit,
     setValue,
-    getValues,
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      picture: "",
-      category: "",
-      title: "",
-      author: "",
-      datePublished: new Date("October 22, 2024"),
-      minutesRead: 0,
-      content: "",
-      references: "",
+      picture: article?.picture || "",
+      category: article?.category || "",
+      title: article?.title || "",
+      author: article?.author || "",
+      datePublished: article?.datePublished || new Date(),
+      minutesRead: article?.minutesRead || 0,
+      content: article?.content || "",
+      references: article?.references || "",
     },
   });
+
+  useEffect(() => {
+    if (article) {
+      setValue("picture", article.picture);
+      setValue("category", article.category);
+      setValue("title", article.title);
+      setValue("author", article.author);
+      setValue("minutesRead", article.minutesRead);
+      setValue("content", article.content);
+      setValue("references", article.references);
+    }
+  }, [article, setValue]);
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
 
     const articleData = {
       ...data,
-      content: introContent, // Map intro content to main content
-      references: mainContent, // Map references content
+      content: introContent,
+      references: mainContent,
     };
 
     try {
-      await axios.post("/api/createArticle", articleData);
-      toast.success("Article posted successfully!");
+      await axios.put(`/api/articles/${article?.id}`, articleData);
+      toast.success("Article updated successfully!");
     } catch (error) {
-      console.error("Error uploading article:", error);
-      toast.error("Something went wrong while posting the article.");
+      console.error("Error updating article:", error);
+      toast.error("Something went wrong while updating the article.");
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +99,7 @@ const ArticleForm = () => {
         className="flex flex-col gap-4 max-w-[1000px]"
       >
         <h1 className="mx-auto font-bold text-4xl my-5">
-          Create a New Article
+          {article ? "Edit Article" : "Create a New Article"}
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -149,7 +180,7 @@ const ArticleForm = () => {
           onClose={() => {}}
         />
 
-        <Button type="submit" disabled={isLoading} label="Post Article" />
+        <Button type="submit" disabled={isLoading} label="Update Article" />
         <Toaster />
       </form>
     </Container>

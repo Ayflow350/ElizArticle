@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { useQuery, QueryClient, QueryClientProvider } from "react-query";
 import Container from "@/app/components/Container";
+import ArticleCard from "./ArticleCard"; // Import the ArticleCard component
 import AuthorCard from "./AuthorCard";
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ interface ArticlesPageWrapperProps {
   articles: Article[];
 }
 
-const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
+const ArticlesPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
   articles,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -41,7 +42,7 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
 
   return (
     <Container>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 bg-orange-400 gap-4 p-4">
         {currentArticles.map((article) => (
           <AuthorCard key={article.id} article={article} />
         ))}
@@ -51,7 +52,7 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
       <div className="flex justify-center items-center mt-10 space-x-2">
         {/* Previous Button */}
         <button
-          className={`px-4 py-2 border rounded flex gap-x-2 items-center ${
+          className={`px-4 py-2 border  rounded flex gap-x-2 items-center ${
             currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -93,4 +94,4 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
   );
 };
 
-export default AuthorPageWrapper;
+export default ArticlesPageWrapper;

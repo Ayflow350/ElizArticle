@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       title,
       author,
       datePublished: datePublished ? new Date(datePublished) : undefined,
-      minutesRead,
+      minutesRead: 0,
       content,
 
       userId,
