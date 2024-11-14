@@ -1,0 +1,176 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+enum Role {
+  USER
+  ADMIN
+}
+model User {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  name            String?
+  email           String    @unique
+  emailVerified   DateTime?
+  image           String?
+  hashedPassword  String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  favouriteIds    String[]  @db.ObjectId
+  role            Role      @default(USER)
+  hasActiveSubscription Boolean @default(false) // New field to indicate active subscription status
+
+  // Relations
+  accounts        Account[]
+  articles        Article[] @relation("UserArticles")
+  subscriptions   Subscription[]
+  invoices        Invoice[]
+  bookmarks       Bookmark[]
+  readingProgress ReadingProgress[]
+  emailLogs       EmailNotification[]
+  analytics       Analytics[]
+}
+
+
+model Account {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String   @db.ObjectId
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.String
+  access_token       String?  @db.String
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.String
+  session_state      String?
+
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELED
+}
+
+model Subscription {
+  id                   String                  @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String                  @db.ObjectId
+  paypalPlanId         String                  
+  paypalSubscriptionId  String                  // PayPal subscription
+  planType             String                  // "monthly" or "yearly"
+  startDate            DateTime                // Date when the subscription starts
+  endDate              DateTime?               // Date when the subscription ends (optional)
+  status               SubscriptionStatus       // Use enum to represent status
+  lastPaymentDate      DateTime?               // Date of the last payment made
+  nextPaymentDate      DateTime?               // Date of the next payment due
+  autoRenew            Boolean                 @default(true) // For tracking automatic renewal
+
+  user                 User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices             Invoice[]               // One-to-many relationship with Invoice
+}
+
+
+model Invoice {
+  id                    String     @id @default(auto()) @map("_id") @db.ObjectId
+  subscriptionId        String     @db.ObjectId // Reference to Subscription
+  paypalInvoiceId       String     // PayPal invoice ID
+  amount                Float      // Amount for the invoice
+  currency              String     @default("USD") // Currency of the invoice
+  paymentStatus         String     @default("unpaid") // "paid", "unpaid", "failed", "pending"
+  paymentDate           DateTime?  // Date when payment was made
+  dueDate               DateTime   // Due date for payment
+  userFirstName         String?    // User's first name for invoicing
+  userLastName          String?    // User's last name for invoicing
+  userEmail             String?    // User's email for invoicing
+
+  subscription          Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade) // Link to Subscription
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String        @db.ObjectId // User ID associated with the invoice
+}
+
+
+
+model Content {
+  id               String     @id @default(auto()) @map("_id") @db.ObjectId
+  title            String
+  author           String
+  publishedDate    DateTime   @default(now())
+  content          String
+  isPremium        Boolean    @default(true)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  bookmarks        Bookmark[]
+  readingProgress  ReadingProgress[]
+  analytics        Analytics[]
+}
+
+model Bookmark {
+  id               String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String     @db.ObjectId
+  contentId        String     @db.ObjectId
+  createdAt        DateTime   @default(now())
+
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content          Content    @relation(fields: [contentId], references: [id], onDelete: Cascade)
+}
+
+model ReadingProgress {
+  id               String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String     @db.ObjectId
+  contentId        String     @db.ObjectId
+  lastAccessed     DateTime?
+  progressPercentage Float    @default(0.0)
+
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content          Content    @relation(fields: [contentId], references: [id], onDelete: Cascade)
+}
+
+model EmailNotification {
+  id               String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String     @db.ObjectId
+  emailType        String     // "payment_confirmation", "renewal_reminder", "content_alert", etc.
+  status           String     @default("pending") // "sent", "failed", "pending"
+  sentDate         DateTime?
+
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Analytics {
+  id               String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String     @db.ObjectId
+  contentId        String     @db.ObjectId
+  timeSpent        Int        @default(0) // Time in seconds
+  viewCount        Int        @default(0)
+  lastAccessed     DateTime?
+
+  user             User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content          Content    @relation(fields: [contentId], references: [id], onDelete: Cascade)
+}
+
+model Article {
+  id               String     @id @default(auto()) @map("_id") @db.ObjectId
+  picture          String     // Remove `?` to make it non-nullable
+  category         String
+  title            String
+  author           String
+  references     String
+  datePublished    DateTime   @default(now())
+  minutesRead      Int        @default(0) // Keeps minutesRead non-nullable
+  content          String
+  userId           String?    @db.ObjectId
+  user             User?      @relation("UserArticles", fields: [userId], references: [id], onDelete: Cascade)
+  
+}
+

@@ -1,0 +1,117 @@
+@import url("https://fonts.googleapis.com/css2?family=Arial:wght@400;700&family=Courier+Prime&family=Georgia:wght@400;700&family=Times+New+Roman:wght@400;700&family=Verdana:wght@400;700&family=Tahoma:wght@400;700&family=Trebuchet+MS:wght@400;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-satoshi: "Satoshi", sans-serif;
+}
+
+body {
+  font-family: "Satoshi", sans-serif;
+  background-color: #fffbf0;
+}
+
+@layer utilities {
+  .shiny-border {
+    position: relative;
+    padding: 2px; /* Adjust to control the border thickness */
+    border-radius: 9999px; /* Fully rounded border */
+    overflow: hidden;
+  }
+
+  .shiny-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px; /* Match the border thickness */
+    background: linear-gradient(
+      120deg,
+      #edc531,
+      rgba(255, 255, 255, 0.8),
+      #edc531
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    /* Set a static shine effect */
+    animation: none; /* Remove animation */
+  }
+
+  .shiny-border-content {
+    position: relative;
+    background-color: #fffbf0; /* Set your background color */
+    z-index: 1;
+    padding: 8px 16px; /* Inner padding */
+    border-radius: inherit;
+  }
+}
+
+/* Prevent user from copying content */
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-touch-callout: none; /* disables long-press actions on iOS */
+}
+
+/* Watermark styling */
+.watermark-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Ensures it's not clickable */
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 0, 0, 0.1),
+    rgba(255, 0, 0, 0.1) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  opacity: 0; /* Initially transparent */
+  z-index: 1000; /* Sits on top of all content */
+  text-align: center;
+  color: rgba(255, 0, 0, 0.15);
+  font-size: 48px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease; /* Smooth transition for opacity */
+}
+
+.watermark-overlay.visible {
+  opacity: 1; /* Visible state when watermarkVisible is true */
+}
+
+/* Hide content during print or PDF export */
+@media print {
+  /* Hide all elements */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Display only the message during print or export */
+  body:before {
+    content: "Printing and exporting as PDF are disabled for this content.";
+    visibility: visible;
+    display: block;
+    text-align: center;
+    margin-top: 50vh;
+    font-size: 24px;
+    font-weight: bold;
+    color: red;
+  }
+
+  /* Hide specific non-printable elements */
+  button,
+  .non-printable {
+    display: none;
+  }
+}
