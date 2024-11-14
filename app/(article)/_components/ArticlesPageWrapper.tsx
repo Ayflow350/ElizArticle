@@ -42,10 +42,12 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
 
   return (
     <Container>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-        {currentArticles.map((article) => (
-          <ArticleCard key={article.id} article={article} />
-        ))}
+      <div className="flex justify-center items-center p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {currentArticles.map((article) => (
+            <ArticleCard key={article.id} article={article} />
+          ))}
+        </div>
       </div>
 
       {/* Pagination Controls */}
@@ -58,7 +60,7 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
         >
-          Previous
+          Preious
         </button>
 
         {/* Page Numbers */}

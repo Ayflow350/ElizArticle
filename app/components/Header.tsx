@@ -35,12 +35,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
       <Link href="/interviews">Interviews</Link>
       <Link href="/Article">Articles</Link>
       <Link href="/books">Books</Link>
-      <button
-        onClick={toggleDropdown}
-        className="focus:outline-none hidden md:inline"
-      >
-        Profile
-      </button>
+
       <div className="relative inline-block">
         <button onClick={toggleDropdown} className="focus:outline-none">
           Profile

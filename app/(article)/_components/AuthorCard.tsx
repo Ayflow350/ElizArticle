@@ -98,7 +98,7 @@ const AuthorCard: React.FC<{ article: Article }> = ({ article }) => {
   const previewContent = getPreviewText(article.content);
 
   return (
-    <Link href={`/AuthorDashboard/Article/${article.id}`} passHref>
+    <Link href={`/Article/${article.id}`} passHref>
       <div className="cursor-pointer flex-col items-center relative">
         <div
           className={`watermark-overlay ${watermarkVisible ? "visible" : ""}`}

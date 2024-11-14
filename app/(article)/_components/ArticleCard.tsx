@@ -99,29 +99,26 @@ const AuthorCard: React.FC<{ article: Article }> = ({ article }) => {
 
   return (
     <Link href={`/Article/${article.id}`} passHref>
-      <div className="cursor-pointer flex-col items-center relative">
-        <div
-          className={`watermark-overlay ${watermarkVisible ? "visible" : ""}`}
-        >
-          Confidential
-        </div>
+      <div className="cursor-pointer  rounded-md shadow-lg flex flex-col justify-between items-center p-4 transition-all hover:shadow-xl ">
         <img
           src={article.picture}
           alt={article.title}
-          className="w-full h-[300px] translate-x-3 mb-3 rounded-md"
+          className="w-full h-[300px] object-cover rounded-md mb-4"
         />
-        <div className="flex gap-x-2 text-black justify-between rounded-full p-3 w-auto mb-3">
-          <h1 className="text-[#ffff] bg-black rounded-full font-bold px-2">
+        <div className="flex  flex-row justify-start gap-x-5 text-left items-center p-2 mb-4">
+          <h1 className="text-sm text-white bg-black rounded-full px-3 py-1">
             {article.category}
           </h1>
-          <h1>{article.minutesRead} min read</h1>
+          <h1 className="text-sm">{article.minutesRead} min read</h1>
         </div>
-        <h1 className="text-lg font-bold">{article.title}</h1>
+        <h1 className="text-lg font-semibold text-center mb-3">
+          {article.title}
+        </h1>
         <p
-          className="my-3"
+          className="text-sm text-gray-700 mb-4"
           dangerouslySetInnerHTML={{ __html: previewContent }}
         ></p>
-        <button className="rounded-lg bg-black gap-x-1 text-white p-3 flex flex-row justify-center items-center">
+        <button className="rounded-lg bg-black text-white py-2 px-4 flex items-center gap-x-2 hover:bg-gray-900 transition-all">
           Read more
           <MdArrowOutward />
         </button>
