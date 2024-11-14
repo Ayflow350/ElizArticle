@@ -101,7 +101,6 @@ import Container from "@/app/components/Container";
 import Banner from "@/assets/userbanner.svg";
 import Image from "next/image";
 import getCurrentUser from "@/app/actions/getCurrentUser";
-import { TbEdit } from "react-icons/tb";
 import Link from "next/link";
 import getSubscriptionByUserId from "@/app/actions/getSubscriptionById"; // Assuming this is the function you created for fetching subscription
 
@@ -141,6 +140,8 @@ const Account = async () => {
   // Fetch subscription details using the userId
   const subscription = await getSubscriptionByUserId(currentUser.id);
 
+  // Log subscription details to the console
+
   // Extract and capitalize the first letter of the user's first name
   const firstInitial = currentUser.name?.charAt(0).toUpperCase();
 
@@ -171,13 +172,9 @@ const Account = async () => {
         <div className="rounded-md shadow-xl p-6 space-y-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="font-semibold">Name</h1>
-              <p>{currentUser.name}</p>
+              <h1 className="font-semibold">Plan Id</h1>
+              <p>{subscription?._id}</p>
             </div>
-            <button className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2">
-              Edit
-              <TbEdit />
-            </button>
           </div>
 
           <div className="flex justify-between items-center">
@@ -185,10 +182,6 @@ const Account = async () => {
               <h1 className="font-semibold">Email</h1>
               <p>{currentUser.email}</p>
             </div>
-            <button className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2">
-              Edit
-              <TbEdit />
-            </button>
           </div>
 
           <div className="flex justify-between items-center">
@@ -201,40 +194,57 @@ const Account = async () => {
                 })}
               </p>
             </div>
-            <button className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2">
-              Edit
-              <TbEdit />
-            </button>
           </div>
 
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-start space-y-4">
             <div>
-              <h1 className="font-semibold">Subscription</h1>
+              <h1 className="font-semibold mb-2">Subscription</h1>
               {/* Display subscription status */}
               {subscription ? (
                 <>
-                  <p>
-                    {subscription.status === "ACTIVE" ? "Active" : "Inactive"}
-                  </p>
-                  <p>Plan Type: {subscription.planType}</p>
-                  <p>
-                    Next Payment:{" "}
-                    {subscription.nextPaymentDate
-                      ? new Date(
-                          subscription.nextPaymentDate
-                        ).toLocaleDateString()
-                      : "Not Available"}
-                  </p>
+                  <div className="mb-4">
+                    <p className="text-lg">
+                      {subscription.status === "ACTIVE" ? "Active" : "Inactive"}
+                    </p>
+                  </div>
+
+                  <div className="mb-4">
+                    <h2 className="font-semibold">Subscription Plan Type</h2>
+                    <p>Plan Type: {subscription.planType}</p>
+                  </div>
+
+                  <div className="mb-4">
+                    <h2 className="font-semibold">Subscription Start Date</h2>
+                    <p>
+                      {subscription.startDate
+                        ? new Date(subscription.startDate).toLocaleDateString()
+                        : "Not Available"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h2 className="font-semibold">Subscription Next Payment</h2>
+                    <p>
+                      {subscription.nextPaymentDate
+                        ? new Date(
+                            subscription.nextPaymentDate
+                          ).toLocaleDateString()
+                        : "Not Available"}
+                    </p>
+                  </div>
                 </>
               ) : (
                 <p>No subscription found.</p>
               )}
             </div>
+          </div>
+
+          <div className="flex justify-end">
             <Link
               href="/Payment"
               className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2"
             >
-              Subscribe
+              Cancel Subscription
             </Link>
           </div>
         </div>

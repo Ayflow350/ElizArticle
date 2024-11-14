@@ -136,7 +136,7 @@ const PaymentPage = async () => {
               {/* PayPal Button */}
               <PaypalSubscriptionButton
                 planId={planId}
-                userId="730f6fc48205daaf75dfa81"
+                userId={currentUser.id}
                 amount={monthlyPrice.toString()}
                 currency="USD"
                 planType={planType}
