@@ -6,7 +6,9 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import Container from "./Container";
 import { SafeUser } from "@/types/index";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { toast } from "react-hot-toast";
 
 import { MdMenu } from "react-icons/md";
 import NavMobile from "./NavMobile";
@@ -22,12 +24,30 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ currentUser }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const [navMobile, setNavMobile] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = useCallback(() => {
-    setIsDropdownOpen((prev) => !prev);
-  }, []);
+    if (!currentUser) {
+      router.push("/signup"); // Redirect to signup if no user
+    } else {
+      setIsDropdownOpen((prev) => !prev);
+    }
+  }, [currentUser, router]);
+
+  const handleLogout = useCallback(() => {
+    signOut({
+      redirect: false, // Prevent automatic redirect
+    })
+      .then(() => {
+        toast.success("You have been signed out.");
+        router.push("/signup");
+      })
+      .catch(() => {
+        toast.error("Something went wrong. Please try again.");
+      });
+  }, [router]);
 
   const defaultNavLinks = (
     <>
@@ -40,12 +60,12 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
         <button onClick={toggleDropdown} className="focus:outline-none">
           Profile
         </button>
-        {isDropdownOpen && (
+        {isDropdownOpen && currentUser && (
           <div className="absolute px-5 -left-10 mt-2 w-[250px] bg-black rounded-lg shadow-lg z-10">
             <div className="absolute top-[-10px] left-10 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[10px] border-transparent  border-b-black"></div>
             <ul className="py-2">
               <div className="flex items-center gap-x-2 border-b py-4 border-gray-400">
-                {currentUser?.image ? (
+                {currentUser.image ? (
                   <Image
                     src={currentUser.image}
                     alt="User Image"
@@ -58,7 +78,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
                 )}
                 <div>
                   <h1 className="font-bold text-white">
-                    {currentUser?.name || "John Doe"}
+                    {currentUser.name || "John Doe"}
                   </h1>
                   <h1 className="text-white font-base">Online</h1>
                 </div>
@@ -79,13 +99,11 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
                     <IoSettings /> Favorites
                   </Link>
                 </li>
-                <li className="px-4 py-2 hover:bg-white hover:text-black text-white cursor-pointer">
-                  <Link
-                    href="/profile/work-diary"
-                    className="flex items-center gap-x-2"
-                  >
-                    <IoLogOut /> LogOut
-                  </Link>
+                <li
+                  className="px-4 py-2 hover:bg-white hover:text-black text-white cursor-pointer flex items-center gap-x-2"
+                  onClick={handleLogout}
+                >
+                  <IoLogOut /> LogOut
                 </li>
               </div>
             </ul>
