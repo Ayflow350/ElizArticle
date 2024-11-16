@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELED
+  PENDING 
+}
 
 enum Role {
   USER
@@ -57,17 +63,13 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-enum SubscriptionStatus {
-  ACTIVE
-  SUSPENDED
-  CANCELED
-}
+
 
 model Subscription {
   id                   String                  @id @default(auto()) @map("_id") @db.ObjectId
   userId               String                  @db.ObjectId
   paypalPlanId         String                  
-  paypalSubscriptionId  String                  // PayPal subscription
+  paypalSubscriptionId  String                @unique  // PayPal subscription
   planType             String                  // "monthly" or "yearly"
   startDate            DateTime                // Date when the subscription starts
   endDate              DateTime?               // Date when the subscription ends (optional)
