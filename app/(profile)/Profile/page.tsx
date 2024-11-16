@@ -2,6 +2,7 @@ import Container from "@/app/components/Container";
 import Banner from "@/assets/userbanner.svg";
 import Image from "next/image";
 import human from "@/assets/human.svg";
+import Footer from "@/app/components/Footer";
 
 const Profile = () => {
   return (
@@ -12,6 +13,7 @@ const Profile = () => {
       <div className="justify-center flex mt-10 relative">
         <Image src={human} alt="" className="justify-center flex -mt-40 " />
       </div>
+      <Footer />
     </Container>
   );
 };

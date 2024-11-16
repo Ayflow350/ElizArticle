@@ -2,6 +2,7 @@
 import getArticles from "@/app/actions/getArticles";
 import { SafeArticle } from "@/types";
 import AuthorPageWrapper from "@/app/(article)/_components/ArticlesPageWrapper";
+import Footer from "@/app/components/Footer";
 
 // Server Component
 const ArticlesPage = async () => {
@@ -17,6 +18,7 @@ const ArticlesPage = async () => {
     return (
       <div>
         <AuthorPageWrapper articles={articlesData} />
+        <Footer />
       </div>
     );
   } catch (error) {

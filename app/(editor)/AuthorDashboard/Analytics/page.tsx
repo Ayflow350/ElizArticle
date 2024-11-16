@@ -12,6 +12,7 @@ import {
   Legend,
 } from "chart.js";
 import PaymentTable from "../_components/PaymentTable";
+import Footer from "@/app/components/Footer";
 
 ChartJS.register(
   BarElement,
@@ -105,6 +106,7 @@ function SubscriptionChart() {
 
         <PaymentTable />
       </div>
+      <Footer />
     </div>
   );
 }

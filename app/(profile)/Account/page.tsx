@@ -5,6 +5,7 @@ import Image from "next/image";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { TbEdit } from "react-icons/tb";
 import Link from "next/link";
+import Footer from "@/app/components/Footer";
 
 export const dynamic = "force-dynamic";
 
@@ -119,6 +120,7 @@ const Account = async () => {
           </div>
         </div>
       </div>
+      <Footer />
     </Container>
   );
 };

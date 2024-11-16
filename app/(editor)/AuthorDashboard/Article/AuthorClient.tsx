@@ -6,6 +6,7 @@ import Image from "next/image";
 import Container from "@/app/components/Container";
 import DOMPurify from "dompurify";
 import Link from "next/link";
+import Footer from "@/app/components/Footer";
 
 export const dynamic = "force-dynamic";
 
@@ -73,6 +74,7 @@ const AuthorClient: React.FC<ArticleClientProps> = ({ article }) => {
           />
         </div>
       )}
+      <Footer />
     </Container>
   );
 };

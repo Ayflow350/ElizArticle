@@ -2,6 +2,7 @@
 import getArticles from "@/app/actions/getArticles";
 import ArticlesPageWrapper from "../_components/ArticlesPageWrapper";
 import { SafeArticle } from "@/types";
+import Footer from "@/app/components/Footer";
 
 // Ensure dynamic data fetching
 export const dynamic = "force-dynamic";
@@ -53,6 +54,7 @@ const ArticlesPage = async () => {
           </p>
         </div>
         <ArticlesPageWrapper articles={articlesData} />
+        <Footer />
       </div>
     );
   } catch (error) {

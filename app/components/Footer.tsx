@@ -6,14 +6,12 @@ import youtube from "@/assets/youtube.svg";
 
 const Footer = () => {
   return (
-    <div className="bg-black pt-20">
-      <Container>
-        <div className=" flex  flex-col space-y-10 md:flex-row justify-between ">
-          <div className="space-y-5 ">
+    <div className=" pt-20">
+      <div className=" flex  bg-black pt-20 flex-col    rounded-lg p-10">
+        <div className="flex   flex-col  md:flex-row justify-between mb-5">
+          <div className="space-y-5  ">
             <div className="relative">
               <Image src={light} alt="logo" className=" h-40 w-40" />
-
-              {/* <div className="border-b border-white  w-40 absolute inset-[40px] -left-1"></div> */}
             </div>
 
             <div className="flex flex-row gap-x-3 items-center">
@@ -24,9 +22,6 @@ const Footer = () => {
               />
               <Image src={youtube} alt="youtube" className="cursor-pointer" />
             </div>
-            <h1 className="text-white font-bold text-xl">
-              contact@elizbright.com
-            </h1>
           </div>
 
           <div className="grid grid-cols-2">
@@ -56,9 +51,16 @@ const Footer = () => {
             </div>
           </div>
         </div>
-
-        <div className="h-[200px]"></div>
-      </Container>
+        <div className="border-b   border-gray-400  w-full mb-3"></div>
+        <div className="flex justify-between">
+          <h1 className="text-white font-normal text-base">
+            @ copyrights 2024
+          </h1>
+          <h1 className="text-white font-normal text-base">
+            contact@elizbright.com
+          </h1>
+        </div>
+      </div>
     </div>
   );
 };

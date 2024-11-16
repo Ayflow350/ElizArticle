@@ -8,6 +8,7 @@ import Container from "@/app/components/Container";
 import Modal from "@/app/components/Modals/ModalBlocking";
 import useModalBlock from "@/app/hooks/useModalBlock";
 import { SafeArticle } from "@/types/index";
+import Footer from "@/app/components/Footer";
 
 interface ArticleClientProps {
   article: SafeArticle;
@@ -147,6 +148,7 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
           onSubmit={onClose}
         />
       )}
+      <Footer />
     </Container>
   );
 };

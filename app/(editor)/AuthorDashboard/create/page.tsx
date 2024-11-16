@@ -10,6 +10,7 @@ import Button from "@/app/components/Button";
 import Container from "@/app/components/Container";
 import ImageUpload from "../_components/imageUpload";
 import { ClipLoader } from "react-spinners"; // Import the ClipLoader component
+import Footer from "@/app/components/Footer";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -168,6 +169,8 @@ const ArticleForm = () => {
           <Toaster />
         </form>
       </div>
+
+      <Footer />
     </Container>
   );
 };

@@ -7,6 +7,7 @@ import getCurrentUser from "@/app/actions/getCurrentUser";
 import Link from "next/link";
 import Image from "next/image";
 import Lock from "@/assets/lock.png";
+import Footer from "@/app/components/Footer";
 
 export const dynamic = "force-dynamic";
 
@@ -168,6 +169,7 @@ const PaymentPage = async () => {
           )
         )}
       </div>
+      <Footer />
     </Container>
   );
 };

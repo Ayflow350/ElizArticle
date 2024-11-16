@@ -6,6 +6,7 @@ import getCurrentUser from "@/app/actions/getCurrentUser";
 import Link from "next/link";
 import getSubscriptionByUserId from "@/app/actions/getSubscriptionById";
 import CancelButton from "../_components/CancelButton";
+import Footer from "@/app/components/Footer";
 
 export const dynamic = "force-dynamic";
 
@@ -158,6 +159,7 @@ const Payment = async () => {
           </div>
         </div>
       </div>
+      <Footer />
     </Container>
   );
 };
