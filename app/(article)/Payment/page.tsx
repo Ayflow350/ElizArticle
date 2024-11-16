@@ -4,6 +4,9 @@ import PaypalSubscriptionButton from "@/app/components/PaypalSubscriptionButton"
 import { twMerge } from "tailwind-merge";
 import { FcCheckmark } from "react-icons/fc";
 import getCurrentUser from "@/app/actions/getCurrentUser";
+import Link from "next/link";
+import Image from "next/image";
+import Lock from "@/assets/lock.png";
 
 export const dynamic = "force-dynamic";
 
@@ -27,19 +30,28 @@ const PaymentPage = async () => {
   // Log the current user data
   console.log(currentUser);
 
-  // If no user, show login prompt
+  // If no user, show login prompt and signup button
   if (!currentUser) {
     return (
       <Container>
-        <h2 className="mt-5 mb-2 text-center text-3xl font-bold">
-          You need to be logged in to access this page.
-        </h2>
-        <p className="text-center text-lg">
-          Please log in to view pricing plans.
-        </p>
-        <a href="/login" className="text-blue-500 underline">
-          Go to Login
-        </a>
+        <div className="flex flex-col justify-center items-center min-h-screen">
+          <Image src={Lock} alt="" className=" w-60 h-60  mb-0" />
+          <h2 className=" mb-2 text-center text-3xl font-bold">
+            You need to be logged in to access this page.
+          </h2>
+          <p className="text-center text-lg">
+            Please log in to view pricing plans.
+          </p>
+          <div className="text-center mt-4">
+            {/* Directly use the Link component */}
+            <Link
+              href="/signup"
+              className="text-white bg-black  py-3 px-6 rounded-lg"
+            >
+              Go to Login
+            </Link>
+          </div>
+        </div>
       </Container>
     );
   }

@@ -9,8 +9,9 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Button from "@/app/components/Button";
 import Container from "@/app/components/Container";
 import ImageUpload from "../_components/imageUpload";
-export const dynamic = "force-dynamic";
+import { ClipLoader } from "react-spinners"; // Import the ClipLoader component
 
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 const ArticleForm = () => {
@@ -64,95 +65,109 @@ const ArticleForm = () => {
 
   return (
     <Container>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-4 max-w-[1000px]"
-      >
-        <h1 className="mx-auto font-bold text-4xl my-5">
-          Create a New Article
-        </h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h1 className="text-lg font-bold mb-2">Title *</h1>
-            <Input
-              id="title"
-              disabled={isLoading}
-              register={register}
-              errors={errors}
-              required
-              placeholder="Enter the article title"
-            />
+      <div className="flex justify-center items-center min-h-screen px-4 relative">
+        {/* Overlay and spinner during loading */}
+        {isLoading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+            <ClipLoader color="#fff" size={100} />{" "}
+            {/* Increased size of spinner */}
           </div>
-
-          <div>
-            <h1 className="text-lg font-bold mb-1">Category *</h1>
-            <Input
-              id="category"
-              disabled={isLoading}
-              register={register}
-              errors={errors}
-              required
-              placeholder="Select a category"
-            />
-          </div>
-
-          <div>
-            <h1 className="text-lg font-bold mb-1">Author *</h1>
-            <Input
-              id="author"
-              disabled={isLoading}
-              register={register}
-              errors={errors}
-              required
-              placeholder="Enter the author's name"
-            />
-          </div>
-
-          <div>
-            <h1 className="text-lg font-bold mb-1">Minutes read *</h1>
-            <Input
-              id="minutesRead"
-              type="number"
-              disabled={isLoading}
-              register={register}
-              errors={errors}
-              required
-              placeholder="Enter estimated minutes to read"
-            />
-          </div>
-        </div>
-
-        <div className="w-[900px] my-5">
-          <ImageUpload
-            value={getValues("picture")}
-            onChange={handleImageChange}
-          />
-        </div>
-
-        {errors.content && (
-          <span className="text-rose-500">Content is required.</span>
         )}
 
-        {/* Editor for main article content */}
-        <Editor
-          title="Article Content"
-          content={introContent}
-          onContentChange={setIntroContent}
-          onClose={() => {}}
-        />
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-4 w-full max-w-4xl mx-auto relative"
+        >
+          <h1 className="mx-auto font-bold text-4xl my-5 text-center">
+            Create a New Article
+          </h1>
 
-        {/* Editor for references */}
-        <Editor
-          title="References"
-          content={mainContent}
-          onContentChange={setMainContent}
-          onClose={() => {}}
-        />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h1 className="text-lg font-bold mb-2">Title *</h1>
+              <Input
+                id="title"
+                disabled={isLoading}
+                register={register}
+                errors={errors}
+                required
+                placeholder="Enter the article title"
+              />
+            </div>
 
-        <Button type="submit" disabled={isLoading} label="Post Article" />
-        <Toaster />
-      </form>
+            <div>
+              <h1 className="text-lg font-bold mb-1">Category *</h1>
+              <Input
+                id="category"
+                disabled={isLoading}
+                register={register}
+                errors={errors}
+                required
+                placeholder="Select a category"
+              />
+            </div>
+
+            <div>
+              <h1 className="text-lg font-bold mb-1">Author *</h1>
+              <Input
+                id="author"
+                disabled={isLoading}
+                register={register}
+                errors={errors}
+                required
+                placeholder="Enter the author's name"
+              />
+            </div>
+
+            <div>
+              <h1 className="text-lg font-bold mb-1">Minutes read *</h1>
+              <Input
+                id="minutesRead"
+                type="number"
+                disabled={isLoading}
+                register={register}
+                errors={errors}
+                required
+                placeholder="Enter estimated minutes to read"
+              />
+            </div>
+          </div>
+
+          <div className="my-5">
+            <ImageUpload
+              value={getValues("picture")}
+              onChange={handleImageChange}
+            />
+          </div>
+
+          {errors.content && (
+            <span className="text-rose-500">Content is required.</span>
+          )}
+
+          {/* Editor for main article content */}
+          <Editor
+            title="Article Content"
+            content={introContent}
+            onContentChange={setIntroContent}
+            onClose={() => {}}
+          />
+
+          {/* Editor for references */}
+          <Editor
+            title="References"
+            content={mainContent}
+            onContentChange={setMainContent}
+            onClose={() => {}}
+          />
+
+          {/* Center the submit button */}
+          <div className="flex justify-center items-center mt-6">
+            <Button type="submit" disabled={isLoading} label="Post Article" />
+          </div>
+
+          <Toaster />
+        </form>
+      </div>
     </Container>
   );
 };

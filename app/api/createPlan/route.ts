@@ -8,17 +8,12 @@ export async function POST(request: Request) {
   const body = await request.json();
   console.log("Received request body:", body);
 
-  const {
-    userId,
-    planType,
-    name,
-    description,
-    amount,
-    currency,
-    paypalSubscriptionId,
-  } = body;
+  const { userId, name, description, amount, currency, paypalSubscriptionId } =
+    body;
 
-  const frequency = planType === "monthly" ? "MONTH" : "YEAR";
+  // Plan type is now always "monthly"
+  const planType = "monthly";
+  const frequency = "MONTH"; // Hardcoded as "MONTH" for monthly
   const intervalCount = 1;
 
   try {
@@ -91,15 +86,24 @@ export async function POST(request: Request) {
         planType,
         startDate: new Date(),
         status: paypalSubscriptionId ? "ACTIVE" : "PENDING", // Status depends on paypalSubscriptionId
-        nextPaymentDate:
-          frequency === "MONTH"
-            ? new Date(new Date().setMonth(new Date().getMonth() + 1))
-            : new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+        nextPaymentDate: new Date(
+          new Date().setMonth(new Date().getMonth() + 1)
+        ), // Always set to monthly
         autoRenew: true,
       },
     });
 
     console.log("Subscription saved in database:", newSubscription);
+
+    // Step 4: Update user subscription status in the user table
+    await prisma.user.update({
+      where: { id: userId },
+      data: { hasActiveSubscription: true },
+    });
+
+    console.log(
+      `User with ID ${userId} has been updated with active subscription`
+    );
 
     // Return success response
     return NextResponse.json({

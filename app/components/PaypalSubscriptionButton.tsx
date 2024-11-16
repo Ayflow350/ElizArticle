@@ -2,6 +2,8 @@
 
 import React from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import toast from "react-hot-toast";
+
 export const dynamic = "force-dynamic";
 
 interface PaypalSubscriptionButtonProps {
@@ -55,12 +57,16 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
       });
 
       if (!response.ok) {
-        console.error("Failed to save subscription to server");
-      } else {
-        console.log("Subscription details saved successfully");
+        const errorData = await response.json();
+        console.error("Failed to save subscription to server:", errorData);
+        toast.error("Failed to save subscription to the server.");
+        return;
       }
+
+      toast.success("Subscription details saved successfully!");
     } catch (error) {
-      console.error("Error sending subscription details to server:", error);
+      console.error("Error sending subscription details to the server:", error);
+      toast.error("An error occurred while saving the subscription.");
     }
   };
 
@@ -74,39 +80,43 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
       await sendSubscriptionDetailsToServer(details);
 
       // Show success message and redirect
-      alert("Subscription successful! Redirecting to the home page...");
+      toast.success("Subscription successful! Redirecting...");
       setTimeout(() => {
-        window.location.href = "/Article"; // Redirect to the home page
-      }, 2000); // Redirect after 2 seconds
+        window.location.href = "/Payments";
+      }, 2000);
     } catch (error) {
       console.error("Error capturing subscription:", error);
+      toast.error("An error occurred while capturing the subscription.");
     }
   };
 
   return (
-    <PayPalScriptProvider
-      options={{
-        clientId:
-          "AZir1pZfj7zgKFGUplvEXt4akiNkP6WHiJ48TgSvEUbR4-dMuiN2lVi9hUU4hY7_XGx-KzLzXp9IAPsn",
-        components: "buttons",
-        intent: "subscription",
-        vault: true,
-      }}
-    >
-      <div className="cursor-pointer">
-        <PayPalButtons
-          createSubscription={(data, actions) => {
-            return actions.subscription.create({
-              plan_id: planId, // Replace with your actual PayPal subscription plan ID
-            });
-          }}
-          onApprove={handleApprove}
-          onError={(err) => {
-            console.error("PayPal Checkout onError", err);
-          }}
-        />
-      </div>
-    </PayPalScriptProvider>
+    <>
+      <PayPalScriptProvider
+        options={{
+          clientId:
+            "AZir1pZfj7zgKFGUplvEXt4akiNkP6WHiJ48TgSvEUbR4-dMuiN2lVi9hUU4hY7_XGx-KzLzXp9IAPsn",
+          components: "buttons",
+          intent: "subscription",
+          vault: true,
+        }}
+      >
+        <div className="cursor-pointer">
+          <PayPalButtons
+            createSubscription={(data, actions) => {
+              return actions.subscription.create({
+                plan_id: planId, // Replace with your actual PayPal subscription plan ID
+              });
+            }}
+            onApprove={handleApprove}
+            onError={(err) => {
+              console.error("PayPal Checkout onError", err);
+              toast.error("An error occurred during PayPal checkout.");
+            }}
+          />
+        </div>
+      </PayPalScriptProvider>
+    </>
   );
 };
 

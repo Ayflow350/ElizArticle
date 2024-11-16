@@ -51,7 +51,7 @@ const LoginModal = () => {
 
       if (callback?.ok) {
         toast.success("Logged in");
-        router.push("/Payment");
+        router.push("/Account");
         loginModal.onClose();
       }
       if (callback?.error) {

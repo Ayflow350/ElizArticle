@@ -44,7 +44,7 @@ const Input: React.FC<InputProps> = ({
         value={inputValue}
         onChange={handleInputChange}
         className={`
-          peer h-14 w-[400px] px-4 text-lg text-[#1C1B1F] bg-white border rounded-lg outline-none transition-all duration-300
+          peer h-14  w-[350px] md:w-[400px] px-4 text-lg text-[#1C1B1F] bg-white border rounded-lg outline-none transition-all duration-300
           ${errors[id] ? "border-rose-500" : "border-[#79747E]"}
           ${errors[id] ? "focus:border-rose-500" : "focus:border-black"}
           disabled:opacity-70 disabled:cursor-not-allowed

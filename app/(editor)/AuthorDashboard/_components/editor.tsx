@@ -40,7 +40,7 @@ const Editor: React.FC<{
         value={value}
         onChange={handleContentChange}
         modules={{ toolbar: { container: toolbarOptions } }}
-        className="h-[300px] w-[870px] border bg-white border-gray-400 rounded-lg"
+        className="w-full max-w-[900px] h-[300px] border bg-white border-gray-400 rounded-lg overflow-y-auto"
       />
     </div>
   );
