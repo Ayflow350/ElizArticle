@@ -23,7 +23,6 @@ interface User {
 const Account = async () => {
   const currentUser = await getCurrentUser();
 
-  // If no user, show login prompt
   if (!currentUser) {
     return (
       <Container>
@@ -40,7 +39,6 @@ const Account = async () => {
     );
   }
 
-  // Extract and capitalize the first letter of the user's first name
   const firstInitial = currentUser.name?.charAt(0).toUpperCase();
 
   return (
@@ -111,12 +109,28 @@ const Account = async () => {
               <h1 className="font-semibold">Subscription</h1>
               <p>{currentUser.hasActiveSubscription ? "Active" : "Inactive"}</p>
             </div>
-            <Link
-              href="/Payment"
-              className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2"
-            >
-              Subscribe
-            </Link>
+            {currentUser.role === "ADMIN" ? (
+              <Link
+                href="/AuthorDashboard/Article"
+                className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2"
+              >
+                Go to Dashboard
+              </Link>
+            ) : currentUser.hasActiveSubscription ? (
+              <Link
+                href="/Articles"
+                className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2"
+              >
+                Go to Articles
+              </Link>
+            ) : (
+              <Link
+                href="/payment"
+                className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2"
+              >
+                Subscribe
+              </Link>
+            )}
           </div>
         </div>
       </div>

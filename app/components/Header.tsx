@@ -1,20 +1,18 @@
 "use client";
 
-import Logo from "@/assets/blocklogo.svg";
-import Image from "next/image";
 import { useState, useCallback } from "react";
-import Link from "next/link";
-import Container from "./Container";
-import { SafeUser } from "@/types/index";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { toast } from "react-hot-toast";
-
+import Image from "next/image";
+import Link from "next/link";
 import { MdMenu } from "react-icons/md";
-import NavMobile from "./NavMobile";
-import { FaUserAlt } from "react-icons/fa";
-import { FaCreditCard } from "react-icons/fa";
+import { FaUserAlt, FaCreditCard } from "react-icons/fa";
 import { IoSettings, IoLogOut } from "react-icons/io5";
+import Logo from "@/assets/blocklogo.svg";
+import Container from "./Container";
+import NavMobile from "./NavMobile";
+import { SafeUser } from "@/types/index";
 
 export const dynamic = "force-dynamic";
 
@@ -36,25 +34,28 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
     }
   }, [currentUser, router]);
 
+  const closeDropdown = useCallback(() => {
+    setIsDropdownOpen(false);
+  }, []);
+
   const handleLogout = useCallback(() => {
-    signOut({
-      redirect: false, // Prevent automatic redirect
-    })
+    signOut({ redirect: false })
       .then(() => {
         toast.success("You have been signed out.");
         router.push("/signup");
+        closeDropdown(); // Close dropdown after logout
       })
       .catch(() => {
         toast.error("Something went wrong. Please try again.");
       });
-  }, [router]);
+  }, [router, closeDropdown]);
 
   const defaultNavLinks = (
     <>
-      <Link href="/">Home</Link>
-      <Link href="/interviews">Interviews</Link>
+      <Link href="https://www.elizbright.com/">Home</Link>
+      <Link href="https://www.elizbright.com/interviews">Interviews</Link>
       <Link href="/Article">Articles</Link>
-      <Link href="/books">Books</Link>
+      <Link href="https://www.elizbright.com/books">Books</Link>
 
       <div className="relative inline-block">
         <button onClick={toggleDropdown} className="focus:outline-none">
@@ -62,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
         </button>
         {isDropdownOpen && currentUser && (
           <div className="absolute px-5 -left-10 mt-2 w-[250px] bg-black rounded-lg shadow-lg z-10">
-            <div className="absolute top-[-10px] left-10 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[10px] border-transparent  border-b-black"></div>
+            <div className="absolute top-[-10px] left-10 w-0 h-0 border-l-[10px] border-r-[10px] border-b-[10px] border-transparent border-b-black"></div>
             <ul className="py-2">
               <div className="flex items-center gap-x-2 border-b py-4 border-gray-400">
                 {currentUser.image ? (
@@ -84,17 +85,26 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
                 </div>
               </div>
               <div className="my-3">
-                <li className="px-4 py-2 hover:bg-white hover:text-black text-white cursor-pointer">
+                <li
+                  className="px-4 py-2 hover:bg-white hover:text-black text-white cursor-pointer"
+                  onClick={closeDropdown}
+                >
                   <Link href="/Account" className="flex items-center gap-x-2">
                     <FaUserAlt /> My Account
                   </Link>
                 </li>
-                <li className="px-4 py-2 hover:bg-white hover:text-black text-white cursor-pointer">
+                <li
+                  className="px-4 py-2 hover:bg-white hover:text-black text-white cursor-pointer"
+                  onClick={closeDropdown}
+                >
                   <Link href="/Payments" className="flex items-center gap-x-2">
                     <FaCreditCard /> Payments
                   </Link>
                 </li>
-                <li className="px-4 py-2 hover:bg-white hover:text-black text-white cursor-pointer">
+                <li
+                  className="px-4 py-2 hover:bg-white hover:text-black text-white cursor-pointer"
+                  onClick={closeDropdown}
+                >
                   <Link href="/Favorite" className="flex items-center gap-x-2">
                     <IoSettings /> Favorites
                   </Link>
@@ -118,7 +128,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
       <Link href="/AuthorDashboard/Article">Overview</Link>
       <Link href="/AuthorDashboard/create">Create Content</Link>
       <Link href="/AuthorDashboard/Analytics">Analytics</Link>
-      <Link href="/EditorDashboard/profile">Profile</Link>
+      <Link href="/EditorDashboard/Account">Profile</Link>
     </>
   );
 

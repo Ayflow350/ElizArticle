@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
 
   // Redirect unauthenticated users trying to access protected routes
   if (!token && !isPublicRoute) {
-    return NextResponse.redirect(new URL("/signup", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   // If user is authenticated, extract details

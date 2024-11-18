@@ -3,9 +3,9 @@
 import React from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import toast from "react-hot-toast";
+import { useMutation, useQueryClient } from "react-query"; // Import useMutation and useQueryClient
 
-export const dynamic = "force-dynamic";
-
+// Define the interface for the subscription response
 interface PaypalSubscriptionButtonProps {
   userId: string;
   planType: string;
@@ -25,59 +25,65 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
   currency,
   planId,
 }) => {
-  console.log(
-    "userId",
-    userId,
-    "planType",
-    planType,
-    "name",
-    name,
-    description,
-    amount,
-    currency
-  );
+  const queryClient = useQueryClient(); // Initialize queryClient to manage the cache
 
-  // Function to send subscription details to the server after approval
-  const sendSubscriptionDetailsToServer = async (details: any) => {
-    try {
-      const response = await fetch("/api/createPlan", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+  // Define the mutation to send subscription details to the server
+  const { mutate: sendSubscriptionDetailsToServer, isLoading: isSubmitting } =
+    useMutation(
+      async (details: any) => {
+        const response = await fetch("/api/createPlan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            planType,
+            name,
+            description,
+            amount,
+            currency,
+            paypalSubscriptionId: details.id, // Use the subscription ID captured from PayPal
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to save subscription.");
+        }
+
+        return response.json();
+      },
+      {
+        onSuccess: (data) => {
+          // Update the query cache on success
+          queryClient.invalidateQueries(["subscriptions", userId]); // Refetch subscriptions for the user
+          queryClient.setQueryData(
+            ["subscriptions", userId],
+            (oldData: any) => ({
+              ...oldData,
+              ...data, // Merge new subscription data
+            })
+          );
+
+          toast.success("Subscription details saved successfully!");
         },
-        body: JSON.stringify({
-          userId,
-          planType,
-          name,
-          description,
-          amount,
-          currency,
-          paypalSubscriptionId: details.id, // Use the subscription ID captured from PayPal
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Failed to save subscription to server:", errorData);
-        toast.error("Failed to save subscription to the server.");
-        return;
+        onError: (error: unknown) => {
+          // Narrow the error type to `Error`
+          const err = error as Error;
+          toast.error(err.message || "Failed to save subscription.");
+        },
       }
+    );
 
-      toast.success("Subscription details saved successfully!");
-    } catch (error) {
-      console.error("Error sending subscription details to the server:", error);
-      toast.error("An error occurred while saving the subscription.");
-    }
-  };
-
-  // Handle approval and send details to the server
+  // Function to handle the approval of the subscription
   const handleApprove = async (data: any, actions: any) => {
     try {
       const details = await actions.subscription.get();
       console.log("Subscription successful for:", details.id);
 
-      // Send subscription details to server with the captured subscription ID
-      await sendSubscriptionDetailsToServer(details);
+      // Mutate (send) subscription details to server using useMutation
+      sendSubscriptionDetailsToServer(details);
 
       // Show success message and redirect
       toast.success("Subscription successful! Redirecting...");
