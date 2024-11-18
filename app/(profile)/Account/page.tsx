@@ -111,7 +111,7 @@ const Account = async () => {
             </div>
             {currentUser.role === "ADMIN" ? (
               <Link
-                href="/AuthorDashboard/Article"
+                href="/AuthorDashboard/create"
                 className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2"
               >
                 Go to Dashboard
@@ -125,7 +125,7 @@ const Account = async () => {
               </Link>
             ) : (
               <Link
-                href="/payment"
+                href="/Payment"
                 className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2"
               >
                 Subscribe

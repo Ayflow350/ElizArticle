@@ -1,5 +1,6 @@
 import getArticleById from "@/app/actions/getArticlesById"; // Ensure this function runs server-side
 import AuthorClient from "../ArticleClient";
+import ArticleClient from "../ArticleClient";
 
 // Helper function to fetch article data
 const fetchArticleData = async (articleId: string) => {
@@ -32,7 +33,7 @@ export default async function ArticlePage({
   // Render the article if found
   return (
     <div className="mt-[100px]">
-      <AuthorClient article={article} />
+      <ArticleClient article={article} />
     </div>
   );
 }
