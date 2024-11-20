@@ -18,8 +18,7 @@ const userNav = [
   { name: "Articles", href: "/Article" },
   { name: "Books", href: "#" },
   { name: "Account", href: "/Account" }, // Changed href to "#"
-  { name: "Account", href: "/Account" }, // Changed href to "#"
-  // Changed href to "#"
+
   { name: "Log Out", href: "#" }, // Changed href to "#"
   { name: "SignUp", href: "/signup" }, // Changed href to "#"
 ];

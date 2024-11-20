@@ -8,34 +8,104 @@ import Container from "@/app/components/Container";
 import Modal from "@/app/components/Modals/ModalBlocking";
 import useModalBlock from "@/app/hooks/useModalBlock";
 import { SafeArticle } from "@/types/index";
-import Footer from "@/app/components/Footer";
-import { TbCaretLeftRightFilled } from "react-icons/tb";
-import { CgArrowLeft } from "react-icons/cg";
-import Link from "next/link";
 
 interface ArticleClientProps {
-  article: SafeArticle | null;
+  article: SafeArticle;
 }
 
 const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
   const [sanitizedContent, setSanitizedContent] = useState<string>("");
-  const [sanitizedReferences, setSanitizedReferences] = useState<string>("");
   const { isOpen, onOpen, onClose } = useModalBlock();
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (article?.content) {
-      setSanitizedContent(DOMPurify.sanitize(article.content));
-    }
-    if (article?.references) {
-      setSanitizedReferences(DOMPurify.sanitize(article.references));
-    }
-  }, [article?.content, article?.references]);
+  // Callback for mouse and gesture detection
+  const handleMouseOut = useCallback(
+    (e: MouseEvent) => {
+      const isMouseOutOfBounds =
+        e.clientY <= 0 || // Top boundary
+        e.clientX >= window.innerWidth || // Right boundary
+        e.clientY >= window.innerHeight || // Bottom boundary
+        e.clientX <= 0; // Left boundary
 
-  if (!article) {
-    return <div>Article not found</div>;
-  }
+      if (isMouseOutOfBounds) {
+        onOpen();
+      }
+    },
+    [onOpen]
+  );
+
+  const handleGestureEnd = useCallback(
+    (e: any) => {
+      if (e.scale < 1) {
+        onOpen();
+      }
+    },
+    [onOpen]
+  );
+
+  const handleSwipeEnd = useCallback(
+    (e: TouchEvent) => {
+      const swipeThreshold = 50;
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+
+      if (
+        touchEndY <= swipeThreshold ||
+        touchEndX >= window.innerWidth - swipeThreshold ||
+        touchEndY >= window.innerHeight - swipeThreshold ||
+        touchEndX <= swipeThreshold
+      ) {
+        onOpen();
+      }
+    },
+    [onOpen]
+  );
+
+  // Reset inactivity timer on user activity
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+    inactivityTimerRef.current = setTimeout(() => {
+      onOpen();
+    }, 60000); // 1 minute of inactivity
+  }, [onOpen]);
+
+  useEffect(() => {
+    const sanitized = DOMPurify.sanitize(article.content);
+    setSanitizedContent(sanitized);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        document.addEventListener("mouseout", handleMouseOut);
+        document.addEventListener("gestureend", handleGestureEnd);
+        document.addEventListener("touchend", handleSwipeEnd);
+        resetInactivityTimer();
+      } else {
+        document.removeEventListener("mouseout", handleMouseOut);
+        document.removeEventListener("gestureend", handleGestureEnd);
+        document.removeEventListener("touchend", handleSwipeEnd);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("mousemove", resetInactivityTimer);
+    document.addEventListener("keypress", resetInactivityTimer);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("mousemove", resetInactivityTimer);
+      document.removeEventListener("keypress", resetInactivityTimer);
+      clearTimeout(inactivityTimerRef.current as ReturnType<typeof setTimeout>);
+    };
+  }, [
+    article.content,
+    handleMouseOut,
+    handleGestureEnd,
+    handleSwipeEnd,
+    resetInactivityTimer,
+  ]);
 
   const handleClick = () => {
     router.push(`/article/${article.id}`);
@@ -43,86 +113,40 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
 
   return (
     <Container>
-      <div className="flex flex-col">
-        <div className="flex justify-between mb-10">
-          <Link
-            href="/Article"
-            className="flex gap-x-1 items-center bg-black rounded-md text-white py-3 px-4"
-          >
-            <CgArrowLeft /> Back
-          </Link>
-
-          <button className="flex gap-x-1 items-center bg-black rounded-md text-white py-3 px-4">
-            Add to Favorites
-          </button>
-        </div>
-        <h1
-          className="text-2xl md:text-3xl lg:text-5xl font-bold mb-8 cursor-pointer"
-          onClick={handleClick}
-        >
-          {article.title}
-        </h1>
-        <div
-          className="relative w-auto h-[500px] mb-4 cursor-pointer"
-          onClick={handleClick}
-        >
-          <Image
-            src={article.picture}
-            alt={article.title}
-            layout="fill"
-            objectFit="cover"
-            className="rounded-lg"
-            priority
-          />
-        </div>
-        <div className="flex justify-between mb-10">
-          <div>
-            <h1 className="font-bold text-lg">Author</h1>
-            <h1>{article.author}</h1>
-          </div>
-          <div>
-            <h1 className="font-bold text-lg">Date Published</h1>
-            <h1>
-              {new Date(article.datePublished).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </h1>
-          </div>
-        </div>
-
-        <div
-          className="my-3 prose prose-lg text-xl mt-4"
-          dangerouslySetInnerHTML={{
-            __html: sanitizedContent,
-          }}
+      <h1
+        className="text-2xl md:text-3xl lg:text-5xl font-bold mb-4 cursor-pointer"
+        onClick={handleClick}
+      >
+        {article.title}
+      </h1>
+      <div
+        className="relative w-auto h-[500px] mb-4 cursor-pointer"
+        onClick={handleClick}
+      >
+        <Image
+          src={article.picture}
+          alt={article.title}
+          layout="fill"
+          objectFit="cover"
+          className="rounded-lg"
+          priority
         />
-
-        {sanitizedReferences && (
-          <div className="mt-8">
-            <h2 className="text-lg font-bold">References</h2>
-            <div
-              className="prose prose-sm mt-2 text-lg"
-              dangerouslySetInnerHTML={{
-                __html: sanitizedReferences,
-              }}
-            />
-          </div>
-        )}
-
-        {isOpen && (
-          <Modal
-            title="Export Not Allowed"
-            paragraph="You cannot export this content."
-            actionLabel="I Agree"
-            isOpen={isOpen}
-            onClose={onClose}
-            onSubmit={onClose}
-          />
-        )}
-        <Footer />
       </div>
+      <div
+        className="my-3"
+        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+      />
+
+      {isOpen && (
+        <Modal
+          title="Export Not Allowed"
+          paragraph="You cannot export this content."
+          actionLabel="I Agree"
+          isOpen={isOpen}
+          onClose={onClose}
+          onSubmit={onClose}
+        />
+      )}
     </Container>
   );
 };
