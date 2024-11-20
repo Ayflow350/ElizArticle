@@ -118,7 +118,7 @@ const Account = async () => {
               </Link>
             ) : currentUser.hasActiveSubscription ? (
               <Link
-                href="/Articles"
+                href="/Article"
                 className="text-white py-2 px-6 items-center border-black rounded-md bg-black border flex gap-x-2"
               >
                 Go to Articles

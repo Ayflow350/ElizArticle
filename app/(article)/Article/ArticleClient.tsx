@@ -89,14 +89,34 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
       }
     };
 
+    // Prevent mouse right-click
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
+    // Block screenshot functionality
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === "PrintScreen" || // Windows Print Screen
+        (e.metaKey && e.shiftKey && e.key === "4") // macOS Command + Shift + 4
+      ) {
+        e.preventDefault();
+        onOpen(); // Open modal or handle screenshot block
+      }
+    };
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
     document.addEventListener("mousemove", resetInactivityTimer);
     document.addEventListener("keypress", resetInactivityTimer);
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       document.removeEventListener("mousemove", resetInactivityTimer);
       document.removeEventListener("keypress", resetInactivityTimer);
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
       clearTimeout(inactivityTimerRef.current as ReturnType<typeof setTimeout>);
     };
   }, [
@@ -105,6 +125,7 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
     handleGestureEnd,
     handleSwipeEnd,
     resetInactivityTimer,
+    onOpen,
   ]);
 
   const handleClick = () => {
@@ -139,9 +160,9 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
 
       {isOpen && (
         <Modal
-          title="Export Not Allowed"
-          paragraph="You cannot export this content."
-          actionLabel="I Agree"
+          title="Export/Copying of this Page is not allowed and there is a fine for it"
+          paragraph="This action is restricted."
+          actionLabel="I Understand"
           isOpen={isOpen}
           onClose={onClose}
           onSubmit={onClose}
