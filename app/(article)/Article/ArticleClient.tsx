@@ -8,6 +8,9 @@ import Container from "@/app/components/Container";
 import Modal from "@/app/components/Modals/ModalBlocking";
 import useModalBlock from "@/app/hooks/useModalBlock";
 import { SafeArticle } from "@/types/index";
+import Link from "next/link";
+import { AiOutlineHeart } from "react-icons/ai";
+import Footer from "@/app/components/Footer";
 
 interface ArticleClientProps {
   article: SafeArticle;
@@ -15,118 +18,57 @@ interface ArticleClientProps {
 
 const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
   const [sanitizedContent, setSanitizedContent] = useState<string>("");
+  const [sanitizedRefrences, setSanitizedRefrences] = useState<string>("");
   const { isOpen, onOpen, onClose } = useModalBlock();
-  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
-  // Callback for mouse and gesture detection
-  const handleMouseOut = useCallback(
+  // Callback for mouse movement
+  const handleMouseMovement = useCallback(
     (e: MouseEvent) => {
-      const isMouseOutOfBounds =
-        e.clientY <= 0 || // Top boundary
-        e.clientX >= window.innerWidth || // Right boundary
-        e.clientY >= window.innerHeight || // Bottom boundary
-        e.clientX <= 0; // Left boundary
-
-      if (isMouseOutOfBounds) {
-        onOpen();
+      // Check if mouse Y position is between 0 and 6
+      if (e.clientY >= 0 && e.clientY <= 6) {
+        onOpen(); // Trigger modal if mouse is in the top 6 pixels
       }
     },
     [onOpen]
   );
 
-  const handleGestureEnd = useCallback(
-    (e: any) => {
-      if (e.scale < 1) {
-        onOpen();
-      }
-    },
-    [onOpen]
-  );
+  // Prevent right-click, copy, and print actions
+  const preventRightClick = (e: MouseEvent) => {
+    e.preventDefault(); // Prevent context menu (right-click)
+  };
 
-  const handleSwipeEnd = useCallback(
-    (e: TouchEvent) => {
-      const swipeThreshold = 50;
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
+  const preventCopy = (e: ClipboardEvent) => {
+    e.preventDefault(); // Prevent copy action
+  };
 
-      if (
-        touchEndY <= swipeThreshold ||
-        touchEndX >= window.innerWidth - swipeThreshold ||
-        touchEndY >= window.innerHeight - swipeThreshold ||
-        touchEndX <= swipeThreshold
-      ) {
-        onOpen();
-      }
-    },
-    [onOpen]
-  );
-
-  // Reset inactivity timer on user activity
-  const resetInactivityTimer = useCallback(() => {
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-    }
-    inactivityTimerRef.current = setTimeout(() => {
-      onOpen();
-    }, 60000); // 1 minute of inactivity
-  }, [onOpen]);
+  const preventPrint = () => {
+    onOpen(); // Trigger modal to block printing
+  };
 
   useEffect(() => {
     const sanitized = DOMPurify.sanitize(article.content);
     setSanitizedContent(sanitized);
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        document.addEventListener("mouseout", handleMouseOut);
-        document.addEventListener("gestureend", handleGestureEnd);
-        document.addEventListener("touchend", handleSwipeEnd);
-        resetInactivityTimer();
-      } else {
-        document.removeEventListener("mouseout", handleMouseOut);
-        document.removeEventListener("gestureend", handleGestureEnd);
-        document.removeEventListener("touchend", handleSwipeEnd);
-      }
-    };
+    const sanitizedRefrences = DOMPurify.sanitize(article.references);
+    setSanitizedRefrences(sanitizedRefrences);
 
-    // Prevent mouse right-click
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-    };
+    // Add event listeners for mouse movement and right-click, copy, and print prevention
+    document.addEventListener("mousemove", handleMouseMovement);
+    document.addEventListener("contextmenu", preventRightClick); // Prevent right-click
+    document.addEventListener("copy", preventCopy); // Prevent copy
+    window.addEventListener("beforeprint", preventPrint); // Prevent printing
+    window.addEventListener("afterprint", preventPrint); // Prevent printing
 
-    // Block screenshot functionality
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (
-        e.key === "PrintScreen" || // Windows Print Screen
-        (e.metaKey && e.shiftKey && e.key === "4") // macOS Command + Shift + 4
-      ) {
-        e.preventDefault();
-        onOpen(); // Open modal or handle screenshot block
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    document.addEventListener("mousemove", resetInactivityTimer);
-    document.addEventListener("keypress", resetInactivityTimer);
-    document.addEventListener("contextmenu", handleContextMenu);
-    document.addEventListener("keydown", handleKeyDown);
-
+    // Cleanup event listeners on unmount
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      document.removeEventListener("mousemove", resetInactivityTimer);
-      document.removeEventListener("keypress", resetInactivityTimer);
-      document.removeEventListener("contextmenu", handleContextMenu);
-      document.removeEventListener("keydown", handleKeyDown);
-      clearTimeout(inactivityTimerRef.current as ReturnType<typeof setTimeout>);
+      document.removeEventListener("mousemove", handleMouseMovement);
+      document.removeEventListener("contextmenu", preventRightClick);
+      document.removeEventListener("copy", preventCopy);
+      window.removeEventListener("beforeprint", preventPrint);
+      window.removeEventListener("afterprint", preventPrint);
     };
-  }, [
-    article.content,
-    handleMouseOut,
-    handleGestureEnd,
-    handleSwipeEnd,
-    resetInactivityTimer,
-    onOpen,
-  ]);
+  }, [article.content, handleMouseMovement]);
 
   const handleClick = () => {
     router.push(`/article/${article.id}`);
@@ -134,8 +76,25 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
 
   return (
     <Container>
+      <div className="flex justify-between mb-6">
+        <Link
+          href="/Article"
+          className="bg-black text-white font-bold rounded-lg py-3 px-5"
+        >
+          Back
+        </Link>
+
+        <Link
+          href="/Article"
+          className="bg-black font-bold w-fit text-white rounded-lg py-3 flex items-center gap-x-2 px-5"
+        >
+          <AiOutlineHeart />
+          Favorites
+        </Link>
+      </div>
+
       <h1
-        className="text-2xl md:text-3xl lg:text-5xl font-bold mb-4 cursor-pointer"
+        className="text-2xl md:text-3xl lg:text-5xl font-bold my-6 cursor-pointer"
         onClick={handleClick}
       >
         {article.title}
@@ -157,10 +116,15 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
         className="my-3"
         dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
+      <div className="my-6 font-bold text-xl ">References</div>
+      <div
+        className="my-3"
+        dangerouslySetInnerHTML={{ __html: sanitizedRefrences }}
+      />
 
       {isOpen && (
         <Modal
-          title="Export/Copying of this Page is not allowed and there is a fine for it"
+          title="Action Not Allowed"
           paragraph="This action is restricted."
           actionLabel="I Understand"
           isOpen={isOpen}
@@ -168,6 +132,7 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
           onSubmit={onClose}
         />
       )}
+      <Footer />
     </Container>
   );
 };
