@@ -211,10 +211,10 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
             <div className="flex items-center gap-x-3">
               <div className="border-l border-[#22221F] h-3"></div>
               <Link
-                href="/AuthorDashboard/create"
+                href="https://calendly.com/eliz-elizbright"
                 className="font-medium text-base text-[#22221F] bg-[#ffe146] py-3 px-6 rounded-full"
               >
-                Create Content
+                Book
               </Link>
             </div>
           </div>
