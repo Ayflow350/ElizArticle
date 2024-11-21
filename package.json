@@ -30,6 +30,7 @@
     "dompurify": "^3.1.7",
     "dotenv": "^16.4.5",
     "ioredis": "^5.4.1",
+    "loadash": "^1.0.0",
     "morgan": "^1.10.0",
     "next": "15.0.2",
     "next-auth": "^4.24.10",
@@ -52,6 +53,7 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/lodash": "^4.17.13",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.17.5",
     "@types/nodemailer": "^6.4.16",
