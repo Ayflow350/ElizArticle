@@ -13,6 +13,9 @@ interface ModalProps {
   onSubmit: () => void;
   title?: string;
   paragraph?: string;
+  guidelines?: string;
+  guidelines2?: string;
+  guidelines3?: string;
   body?: React.ReactElement;
   footer?: React.ReactElement;
   actionLabel: string;
@@ -26,6 +29,9 @@ const Modal: React.FC<ModalProps> = ({
   onSubmit,
   title,
   paragraph,
+  guidelines,
+  guidelines2,
+  guidelines3,
   body,
   footer,
   actionLabel,
@@ -83,6 +89,11 @@ const Modal: React.FC<ModalProps> = ({
                 </div>
                 <h1 className="text-xl font-bold">{title}</h1>
                 <h1 className="text-base font-normal">{paragraph}</h1>
+                <div className="mt-4 space-y-3">
+                  <h1 className="text-base font-normal"> 1. {guidelines}</h1>
+                  <h1 className="text-base font-normal"> 2. {guidelines2}</h1>
+                  <h1 className="text-base font-normal"> 3. {guidelines3}</h1>
+                </div>
               </div>
               <div className="flex justify-center flex-col items-center mb-6">
                 <div className="relative p-6">{body}</div>
