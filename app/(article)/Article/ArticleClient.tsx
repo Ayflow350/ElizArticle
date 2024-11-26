@@ -16,57 +16,10 @@ interface ArticleClientProps {
 const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
   const [sanitizedContent, setSanitizedContent] = useState<string>("");
   const { isOpen, onOpen, onClose } = useModalBlock();
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
-  const [trail, setTrail] = useState<{ x: number; y: number; id: number }[]>(
-    []
-  );
-  const trailRef = useRef<number>(0);
-  const mouseMoveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
-
-  // Disable print/save options using JavaScript
-  useEffect(() => {
-    const preventSavePrint = (e: KeyboardEvent) => {
-      if (e.ctrlKey && (e.key === "s" || e.key === "p")) {
-        e.preventDefault();
-        alert("Save and Print features are disabled!");
-      }
-    };
-    document.addEventListener("keydown", preventSavePrint);
-
-    return () => document.removeEventListener("keydown", preventSavePrint);
-  }, []);
-
-  // Enter full-screen mode automatically
-  useEffect(() => {
-    const requestFullScreen = () => {
-      const doc = document.documentElement;
-      if (doc.requestFullscreen) {
-        doc.requestFullscreen();
-      }
-    };
-    requestFullScreen();
-  }, []);
-
-  // Hide the page when the browser menu or dev tools are opened
-  useEffect(() => {
-    const detectMenuOpen = (e: MouseEvent) => {
-      if (e.button === 2) {
-        alert("Right-click is disabled!");
-        document.body.style.visibility = "hidden";
-        setTimeout(() => {
-          document.body.style.visibility = "visible";
-        }, 1000);
-      }
-    };
-
-    document.addEventListener("contextmenu", detectMenuOpen);
-    return () => document.removeEventListener("contextmenu", detectMenuOpen);
-  }, []);
-
-  // Callback for mouse and gesture detection (triggering modal)
+  // Callback for mouse and gesture detection
   const handleMouseOut = useCallback(
     (e: MouseEvent) => {
       const isMouseOutOfBounds =
@@ -82,6 +35,43 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
     [onOpen]
   );
 
+  const handleGestureEnd = useCallback(
+    (e: any) => {
+      if (e.scale < 1) {
+        onOpen();
+      }
+    },
+    [onOpen]
+  );
+
+  const handleSwipeEnd = useCallback(
+    (e: TouchEvent) => {
+      const swipeThreshold = 50;
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+
+      if (
+        touchEndY <= swipeThreshold ||
+        touchEndX >= window.innerWidth - swipeThreshold ||
+        touchEndY >= window.innerHeight - swipeThreshold ||
+        touchEndX <= swipeThreshold
+      ) {
+        onOpen();
+      }
+    },
+    [onOpen]
+  );
+
+  // Reset inactivity timer on user activity
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+    inactivityTimerRef.current = setTimeout(() => {
+      onOpen();
+    }, 60000); // 1 minute of inactivity
+  }, [onOpen]);
+
   useEffect(() => {
     const sanitized = DOMPurify.sanitize(article.content);
     setSanitizedContent(sanitized);
@@ -89,17 +79,33 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         document.addEventListener("mouseout", handleMouseOut);
+        document.addEventListener("gestureend", handleGestureEnd);
+        document.addEventListener("touchend", handleSwipeEnd);
+        resetInactivityTimer();
       } else {
         document.removeEventListener("mouseout", handleMouseOut);
+        document.removeEventListener("gestureend", handleGestureEnd);
+        document.removeEventListener("touchend", handleSwipeEnd);
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("mousemove", resetInactivityTimer);
+    document.addEventListener("keypress", resetInactivityTimer);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("mousemove", resetInactivityTimer);
+      document.removeEventListener("keypress", resetInactivityTimer);
+      clearTimeout(inactivityTimerRef.current as ReturnType<typeof setTimeout>);
     };
-  }, [article.content, handleMouseOut]);
+  }, [
+    article.content,
+    handleMouseOut,
+    handleGestureEnd,
+    handleSwipeEnd,
+    resetInactivityTimer,
+  ]);
 
   const handleClick = () => {
     router.push(`/article/${article.id}`);
@@ -131,7 +137,6 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
         dangerouslySetInnerHTML={{ __html: sanitizedContent }}
       />
 
-      {/* Modal that appears when the mouse reaches the top */}
       {isOpen && (
         <Modal
           title="Export Not Allowed"

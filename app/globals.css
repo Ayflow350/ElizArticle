@@ -130,4 +130,11 @@ body {
       z-index: 9999;
     }
   }
+
+  @supports (-webkit-touch-callout: none) {
+    body {
+      color: transparent !important;
+      background: repeating-linear-gradient(45deg, red, yellow 10px);
+    }
+  }
 }
