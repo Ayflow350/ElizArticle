@@ -1,5 +1,11 @@
 import prisma from "@/app/libs/prismadb";
 
+interface IUser {
+  id: string;
+  name: string | null; // Allow `name` to be nullable
+  email: string;
+}
+
 interface ISubscription {
   _id: string;
   userId: string;
@@ -11,6 +17,7 @@ interface ISubscription {
   lastPaymentDate: Date | null;
   nextPaymentDate: Date | null; // Make this nullable
   autoRenew: boolean;
+  user: IUser | null; // Include user details here
 }
 
 export default async function getAllSubscribers(): Promise<ISubscription[]> {
@@ -27,19 +34,31 @@ export default async function getAllSubscribers(): Promise<ISubscription[]> {
       return [];
     }
 
-    // Format each subscription to match the ISubscription interface
-    const formattedSubscriptions: ISubscription[] = subscriptions.map(
-      (subscription) => ({
-        _id: subscription.id, // Renamed here
-        userId: subscription.userId,
-        paypalPlanId: subscription.paypalPlanId,
-        paypalSubscriptionId: subscription.paypalSubscriptionId,
-        planType: subscription.planType,
-        startDate: subscription.startDate,
-        status: subscription.status,
-        lastPaymentDate: subscription.lastPaymentDate,
-        nextPaymentDate: subscription.nextPaymentDate,
-        autoRenew: subscription.autoRenew,
+    // Fetch user information for each subscription
+    const formattedSubscriptions: ISubscription[] = await Promise.all(
+      subscriptions.map(async (subscription) => {
+        const user = await prisma.user.findUnique({
+          where: { id: subscription.userId },
+          select: {
+            id: true,
+            name: true, // Matches the nullable definition in IUser
+            email: true,
+          },
+        });
+
+        return {
+          _id: subscription.id, // Renamed here
+          userId: subscription.userId,
+          paypalPlanId: subscription.paypalPlanId,
+          paypalSubscriptionId: subscription.paypalSubscriptionId,
+          planType: subscription.planType,
+          startDate: subscription.startDate,
+          status: subscription.status,
+          lastPaymentDate: subscription.lastPaymentDate,
+          nextPaymentDate: subscription.nextPaymentDate,
+          autoRenew: subscription.autoRenew,
+          user: user || null, // Attach user info or null if not found
+        };
       })
     );
 

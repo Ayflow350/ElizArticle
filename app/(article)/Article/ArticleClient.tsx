@@ -8,6 +8,7 @@ import Container from "@/app/components/Container";
 import Modal from "@/app/components/Modals/ModalBlocking";
 import useMouseTracker from "@/app/hooks/useMouseTracker";
 import { SafeArticle } from "@/types/index";
+import Footer from "@/app/components/Footer";
 
 interface ArticleClientProps {
   article: SafeArticle;
@@ -15,6 +16,7 @@ interface ArticleClientProps {
 
 const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
   const [sanitizedContent, setSanitizedContent] = useState<string>("");
+  const [sanitizedReferences, setSanitizedReferences] = useState<string>("");
   const [isModalOpen, setIsModalOpen] = useState(true); // Modal starts open
   const [isMouseLocked, setIsMouseLocked] = useState(false); // Lock mouse
   const router = useRouter();
@@ -63,6 +65,11 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
     const sanitized = DOMPurify.sanitize(article.content);
     setSanitizedContent(sanitized);
   }, [article.content]);
+  // Sanitize the article content on mount
+  React.useEffect(() => {
+    const sanitized = DOMPurify.sanitize(article.references);
+    setSanitizedReferences(sanitized);
+  }, [article.references]);
 
   // Automatically unlock mouse if pointer lock is exited
   useEffect(() => {
@@ -96,11 +103,12 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
   return (
     <Container>
       <h1
-        className="text-2xl md:text-3xl lg:text-5xl font-bold mb-4 cursor-pointer"
+        className="text-4xl md:text-3xl  lg:text-5xl font-bold mb-6 cursor-pointer"
         onClick={handleClick}
       >
         {article.title}
       </h1>
+
       <div
         className="relative w-auto h-[500px] mb-4 cursor-pointer"
         onClick={handleClick}
@@ -114,9 +122,33 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
           priority
         />
       </div>
+
+      <h1 className="text-lg bg-black text-white rounded-full mt-3  w-fit px-3 py-1">
+        {article.category}
+      </h1>
+
+      <div className="mt-4 flex justify-between">
+        <div>
+          <h1 className="font-bold">Article Author</h1>
+          {article.author}
+        </div>
+        <div>
+          <h1 className="font-bold">Minutes Read</h1>
+          {article.minutesRead} minutes
+        </div>
+      </div>
+
       <div
-        className="my-3"
+        className="mb-3 indent-10 text-lg mt-8"
         dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+      />
+
+      <div className="mb-4 mt-10">
+        <h1 className="text-2xl  font-extrabold">References</h1>
+      </div>
+      <div
+        className=""
+        dangerouslySetInnerHTML={{ __html: sanitizedReferences }}
       />
 
       {isModalOpen && (
@@ -147,6 +179,7 @@ const ArticleClient: React.FC<ArticleClientProps> = ({ article }) => {
           }}
         />
       )}
+      <Footer />
     </Container>
   );
 };

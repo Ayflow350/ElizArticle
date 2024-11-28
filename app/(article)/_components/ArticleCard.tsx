@@ -99,26 +99,44 @@ const AuthorCard: React.FC<{ article: Article }> = ({ article }) => {
 
   return (
     <Link href={`/Article/${article.id}`} passHref>
-      <div className="cursor-pointer  rounded-md shadow-lg flex flex-col justify-between items-center p-4 transition-all hover:shadow-xl ">
-        <img
-          src={article.picture}
-          alt={article.title}
-          className="w-full h-[300px] object-cover rounded-md mb-4"
-        />
-        <div className="flex  flex-row justify-start gap-x-5 text-left items-center p-2 mb-4">
-          <h1 className="text-sm text-white bg-black rounded-full px-3 py-1">
-            {article.category}
-          </h1>
-          <h1 className="text-sm">{article.minutesRead} min read</h1>
+      <div
+        className="cursor-pointer w-[400px] h-[550px] rounded-md shadow-lg flex flex-col justify-between items-center p-6 
+        transition-all hover:shadow-xl bg-transparent border border-gray-300 backdrop-blur-sm"
+      >
+        {/* Image Section */}
+        <div className="w-full h-[200px] overflow-hidden rounded-md mb-4">
+          <img
+            src={article.picture}
+            alt={article.title}
+            className="w-full h-full object-cover"
+          />
         </div>
-        <h1 className="text-lg font-semibold text-center mb-3">
-          {article.title}
-        </h1>
+
+        {/* Category and Reading Time */}
+        <div className="flex flex-row justify-between  w-full  text-left items-center mb-4">
+          <div>
+            <h1 className="text-sm text-white bg-black rounded-full px-3 py-1">
+              {article.category}
+            </h1>
+          </div>
+          <div>
+            <h1 className="text-sm">{article.minutesRead} min read</h1>
+          </div>
+        </div>
+
+        {/* Title */}
+        <div className="flex text-left   mb-3">
+          <h1 className="text-xl  font-semibold  ">{article.title}</h1>
+        </div>
+
+        {/* Preview Content */}
         <p
-          className="text-sm text-gray-700 mb-4"
+          className="text-lg text-gray-700  mb-4 line-clamp-4"
           dangerouslySetInnerHTML={{ __html: previewContent }}
         ></p>
-        <button className="rounded-lg bg-black text-white py-2 px-4 flex items-center gap-x-2 hover:bg-gray-900 transition-all">
+
+        {/* Button */}
+        <button className="rounded-lg bg-black text-white py-2 px-6 flex items-center gap-x-2 hover:bg-gray-900 transition-all">
           Read more
           <MdArrowOutward />
         </button>

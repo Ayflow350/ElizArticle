@@ -37,7 +37,7 @@ export async function POST(request: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          product_id: "PROD-2621363682433132H", // Replace with your product ID
+          product_id: "PROD-3H278840JU549543D", // Replace with your product ID
           name,
           description,
           billing_cycles: [

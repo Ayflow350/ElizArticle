@@ -42,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
     signOut({ redirect: false })
       .then(() => {
         toast.success("You have been signed out.");
-        router.push("/signup");
+        router.push("/login");
         closeDropdown(); // Close dropdown after logout
       })
       .catch(() => {
@@ -210,12 +210,22 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
             </nav>
             <div className="flex items-center gap-x-3">
               <div className="border-l border-[#22221F] h-3"></div>
-              <Link
-                href="https://calendly.com/eliz-elizbright"
-                className="font-medium text-base text-[#22221F] bg-[#ffe146] py-3 px-6 rounded-full"
-              >
-                Book
-              </Link>
+
+              {pathname?.startsWith("/AuthorDashboard") ? (
+                <Link
+                  href="/AuthorDashboard/create"
+                  className="font-medium text-base text-[#22221F] bg-[#ffe146] py-3 px-6 rounded-full"
+                >
+                  Create Article
+                </Link>
+              ) : (
+                <Link
+                  href="https://calendly.com/eliz-elizbright"
+                  className="font-medium text-base text-[#22221F] bg-[#ffe146] py-3 px-6 rounded-full"
+                >
+                  Book
+                </Link>
+              )}
             </div>
           </div>
 

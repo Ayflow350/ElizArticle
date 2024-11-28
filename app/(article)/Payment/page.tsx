@@ -62,7 +62,7 @@ const PaymentPage = async () => {
       title: "Monthly",
       monthlyPrice: 12,
       duration: "month",
-      planId: "P-12V23304WY318440JM4UGEVI",
+      planId: "P-13932794518647939M47O6NY",
       buttonText: "Sign up now",
       popular: false,
       inverse: true,
@@ -70,29 +70,11 @@ const PaymentPage = async () => {
       name: "Monthly Plan",
       description: "This is the monthly subscription plan",
       features: [
-        "Up to 50 project members",
-        "Unlimited tasks and projects",
-        "50GB storage",
-        "Integrations",
-      ],
-    },
-    {
-      title: "Yearly",
-      monthlyPrice: 144,
-      duration: "year",
-      planId: "P-3301733910084232XM4UMAEQ",
-      buttonText: "Sign up now",
-      popular: true,
-      inverse: false,
-      planType: "recurring",
-      name: "Yearly Plan",
-      description: "This is the yearly subscription plan",
-      features: [
-        "Up to 5 project members",
-        "Unlimited tasks and projects",
-        "200GB storage",
-        "Dedicated account manager",
-        "Custom fields",
+        "Access to a vast library of health research articles",
+        "Personalized recommendations based on your interests",
+        "Ability to filter and search articles by keyword, author, or publication",
+        "Option to save and bookmark articles for future reference",
+        "Integration with other health and wellness tools",
       ],
     },
   ];
@@ -142,7 +124,7 @@ const PaymentPage = async () => {
               </div>
 
               <div className="flex items-baseline gap-1 mt-6 mb-4">
-                <span className="text-4xl font-bold">${monthlyPrice}</span>
+                <span className="text-4xl font-bold">€{monthlyPrice}</span>
                 <span className="font-bold">{`/${duration}`}</span>
               </div>
 

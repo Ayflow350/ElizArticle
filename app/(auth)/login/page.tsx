@@ -11,6 +11,9 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 import Input from "../../components/inputs/input";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ScaleLoader } from "react-spinners"; // Import ScaleLoader
+import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -18,6 +21,7 @@ export const dynamicParams = true;
 const SignUp = () => {
   const loginModal = useLoginModal();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -25,27 +29,28 @@ const SignUp = () => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      name: "",
       email: "",
       password: "",
     },
   });
-
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
-    axios
-      .post("/api/register", data)
-      .then(() => {
-        toast.success("Success! Account created.");
-        loginModal.onOpen();
-      })
-      .catch(() => {
-        toast.error("Something went wrong. Please try again.");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    signIn("credentials", {
+      ...data,
+      redirect: false,
+    }).then((callback) => {
+      setIsLoading(false);
+
+      if (callback?.ok) {
+        toast.success("Logged in");
+        router.push("/Account");
+        loginModal.onClose();
+      }
+      if (callback?.error) {
+        toast.error(callback.error);
+      }
+    });
   };
 
   return (
@@ -54,7 +59,7 @@ const SignUp = () => {
         {/* text */}
         <div className="flex flex-1 items-center text-center flex-col">
           <h1 className="font-bold text-[32px] text-[#22221F] my-3">
-            Create your account
+            Log in to your account
           </h1>
           <h2 className="text-[#666666] font-normal max-w-[400px]  text-[20px]">
             Subscribe now to get full access to my research articles.
@@ -67,7 +72,7 @@ const SignUp = () => {
             className="bg-white rounded-full border mt-8 mb-3 flex border-black gap-x-4 px-20 py-4"
           >
             <Image src={Google} alt="google-button" />
-            <span className="font-extrabold bg-white">Sign Up with Google</span>
+            <span className="font-extrabold bg-white">Login with Google</span>
           </button>
           <div className="flex items-center justify-center mt-4 w-[500px]">
             <div className="h-[1px] bg-gray-300 flex-grow mr-3"></div>
@@ -83,14 +88,7 @@ const SignUp = () => {
               errors={errors}
               required
             />
-            <Input
-              id="name"
-              label="Name"
-              disabled={isLoading}
-              register={register}
-              errors={errors}
-              required
-            />
+
             <Input
               id="password"
               type="password"
@@ -116,13 +114,10 @@ const SignUp = () => {
               "Submit"
             )}
           </button>
-          <button
-            className="flex items-center gap-x-1"
-            onClick={loginModal.onOpen}
-          >
+          <Link className="flex items-center gap-x-1" href="/signup">
             <h1 className="text-neutral-500">Already have an account?</h1>{" "}
-            <span className="text-black text-lg">Log in</span>
-          </button>
+            <span className="text-black text-lg">Sign Up</span>
+          </Link>
         </div>
 
         {/* picture */}

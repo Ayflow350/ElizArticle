@@ -26,7 +26,7 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
   planId,
 }) => {
   const queryClient = useQueryClient(); // Initialize queryClient to manage the cache
-
+  const clientId = process.env.PAYPAL_CLIENT_ID;
   // Define the mutation to send subscription details to the server
   const { mutate: sendSubscriptionDetailsToServer, isLoading: isSubmitting } =
     useMutation(
@@ -101,7 +101,7 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
       <PayPalScriptProvider
         options={{
           clientId:
-            "AZir1pZfj7zgKFGUplvEXt4akiNkP6WHiJ48TgSvEUbR4-dMuiN2lVi9hUU4hY7_XGx-KzLzXp9IAPsn",
+            "AX6l38gGE1NLqiNDpAV4cutjXAj40Ph4HeBhag9GSGuE9dQUcRbYm6Km2EEvchgI4PUsJL1-LgoKfluH",
           components: "buttons",
           intent: "subscription",
           vault: true,

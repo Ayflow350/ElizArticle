@@ -150,11 +150,24 @@ const Payment = async () => {
           </div>
 
           <div className="flex justify-end">
-            {subscription && (
+            {subscription?.status === "ACTIVE" ? (
               <CancelButton
                 userId={currentUser.id}
                 subscriptionId={subscription.paypalSubscriptionId}
+                currentUser={{ name: currentUser.name || "" }}
+                nextPaymentDate={
+                  subscription.nextPaymentDate
+                    ? subscription.nextPaymentDate.toLocaleDateString()
+                    : ""
+                }
               />
+            ) : (
+              <Link
+                href="/Payment"
+                className="bg-black text-white px-4 py-2 rounded"
+              >
+                Subscribe
+              </Link>
             )}
           </div>
         </div>
