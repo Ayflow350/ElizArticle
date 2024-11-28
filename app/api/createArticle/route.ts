@@ -15,6 +15,7 @@ export async function POST(request: Request) {
     userId,
   } = body;
 
+  // Ensure `status` is set to `DRAFT` by default
   const editorArticle = await prisma.article.create({
     data: {
       picture,
@@ -22,9 +23,10 @@ export async function POST(request: Request) {
       title,
       author,
       datePublished: datePublished ? new Date(datePublished) : undefined,
-      minutesRead,
+      minutesRead: minutesRead || 0, // Use default if minutesRead is not provided
       content,
       references,
+      status: "DRAFT", // Explicitly set the status to DRAFT
       userId,
     },
   });

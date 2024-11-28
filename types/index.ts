@@ -14,8 +14,9 @@ export type SafeArticle = Omit<
   Article,
   "userId" | "createdAt" | "updatedAt" | "datePublished"
 > & {
-  datePublished: string; // Format datePublished as a string
+  datePublished: string | null; // Format datePublished as a string
   references: string;
+
   user: {
     id: string;
     name: string | null;

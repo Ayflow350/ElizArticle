@@ -8,10 +8,12 @@ export interface IArticleParams {
   datePublished?: string;
   author?: string;
   minReadTime?: number;
-  references: string; // Ensure this is a required field
+  references?: string; // Make this optional for flexibility
+  status?: string; // Add the status field for filtering
 }
 
-const formatDate = (date: Date): string => date.toISOString().split("T")[0];
+const formatDate = (date: Date | null): string | null =>
+  date ? date.toISOString().split("T")[0] : null;
 
 export default async function getArticles(
   params: IArticleParams
@@ -29,9 +31,10 @@ export default async function getArticles(
     author,
     minReadTime,
     references,
+    status, // Destructure the status field
   } = params;
 
-  // Construct the query object with additional references field if provided
+  // Construct the query object
   const query: Record<string, any> = {
     ...(userId && { userId }),
     ...(category && { category }),
@@ -42,6 +45,7 @@ export default async function getArticles(
     ...(references && {
       references: { contains: references, mode: "insensitive" },
     }),
+    ...(status && { status }), // Filter by status if provided
   };
 
   try {
@@ -57,11 +61,12 @@ export default async function getArticles(
       author: article.author,
       category: article.category,
       content: article.content,
-      datePublished: formatDate(article.datePublished),
+      datePublished: formatDate(article.datePublished), // Handle potential null values
       minutesRead: article.minutesRead,
       userId: article.userId,
       picture: article.picture,
-      references: article.references, // Ensure references are mapped
+      references: article.references,
+      status: article.status,
       user: article.user
         ? {
             id: article.user.id,

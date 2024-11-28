@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Input from "@/app/components/inputs/article";
 import toast, { Toaster } from "react-hot-toast";
 import Editor from "../_components/editor";
@@ -11,6 +12,8 @@ import Container from "@/app/components/Container";
 import ImageUpload from "../_components/imageUpload";
 import { ClipLoader } from "react-spinners"; // Import the ClipLoader component
 import Footer from "@/app/components/Footer";
+import { MdPreview, MdSave } from "react-icons/md";
+import { FaAngleDown } from "react-icons/fa";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -19,6 +22,7 @@ const ArticleForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [introContent, setIntroContent] = useState("");
   const [mainContent, setMainContent] = useState("");
+  const router = useRouter();
 
   const {
     register,
@@ -40,6 +44,7 @@ const ArticleForm = () => {
   });
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    // Initialize the router
     setIsLoading(true);
 
     const articleData = {
@@ -50,8 +55,15 @@ const ArticleForm = () => {
     };
 
     try {
-      await axios.post("/api/createArticle", articleData);
+      const response = await axios.post("/api/createArticle", articleData);
+
+      // Assuming the response contains the article ID
+      const { id } = response.data;
+
       toast.success("Article posted successfully!");
+
+      // Navigate to the new article page
+      router.push(`/AuthorDashboard/PublishArticle/Article/${id}`);
     } catch (error) {
       console.error("Error uploading article:", error);
       toast.error("Something went wrong while posting the article.");
@@ -83,7 +95,7 @@ const ArticleForm = () => {
             Create a New Article
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div>
               <h1 className="text-lg font-bold mb-2">Title *</h1>
               <Input
@@ -96,16 +108,42 @@ const ArticleForm = () => {
               />
             </div>
 
-            <div>
+            <div className="relative w-full">
               <h1 className="text-lg font-bold mb-1">Category *</h1>
-              <Input
-                id="category"
-                disabled={isLoading}
-                register={register}
-                errors={errors}
-                required
-                placeholder="Select a category"
-              />
+              <div className="relative">
+                <select
+                  id="category"
+                  {...register("category", { required: true })}
+                  disabled={isLoading}
+                  className={`
+        peer h-14 w-[450px] md:w-[400px] px-4 pr-10 text-lg text-[#1C1B1F] bg-white border rounded-lg outline-none transition-all duration-300
+        ${errors.category ? "border-rose-500" : "border-[#79747E]"}
+        ${errors.category ? "focus:border-rose-500" : "focus:border-black"}
+        disabled:opacity-70 disabled:cursor-not-allowed appearance-none
+      `}
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Select a category
+                  </option>
+                  <option value="Thyroid Function">Thyroid Function</option>
+                  <option value="Adrenal Function">Adrenal Function</option>
+                  <option value="Steroid Hormones">Steroid Hormones</option>
+                  <option value="Miscellaneous">Miscellaneous</option>
+                  {/* Add more categories as needed */}
+                </select>
+
+                {/* Custom dropdown icon */}
+                <span className="absolute inset-y-0 right-1 lg:right-12 flex items-center pointer-events-none text-black">
+                  <FaAngleDown />
+                </span>
+              </div>
+
+              {errors.category && (
+                <span className="text-rose-500 text-sm mt-1">
+                  Category is required.
+                </span>
+              )}
             </div>
 
             <div>
@@ -163,7 +201,12 @@ const ArticleForm = () => {
 
           {/* Center the submit button */}
           <div className="flex justify-center items-center mt-6">
-            <Button type="submit" disabled={isLoading} label="Post Article" />
+            <Button
+              type="submit"
+              disabled={isLoading}
+              icon={<MdPreview />}
+              label="Preview Article"
+            />
           </div>
 
           <Toaster />

@@ -1,7 +1,7 @@
 // app/articles/page.tsx
 import getArticles from "@/app/actions/getArticles";
 import { SafeArticle } from "@/types";
-import AuthorPageWrapper from "@/app/(article)/_components/AuthorPageWrapper";
+import AuthorPageWrapper from "@/app/(article)/_components/ArticlesPageWrapper";
 import Footer from "@/app/components/Footer";
 
 // Server Component

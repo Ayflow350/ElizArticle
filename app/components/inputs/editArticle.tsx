@@ -52,7 +52,7 @@ const Input: React.FC<InputProps> = ({
         value={inputValue} // Controlled component with value prop
         onChange={handleChange} // Update inputValue on change
         className={`
-          peer h-14 w-[400px] px-4 text-lg text-[#1C1B1F] bg-white border rounded-lg outline-none transition-all duration-300
+          peer h-14 md:w-[600px] w-[550px] lg:w-[400px] px-4 text-lg text-[#1C1B1F] bg-white border rounded-lg outline-none transition-all duration-300
           ${errors[id] ? "border-rose-500" : "border-[#79747E]"}
           ${errors[id] ? "focus:border-rose-500" : "focus:border-black"}
           disabled:opacity-70 disabled:cursor-not-allowed

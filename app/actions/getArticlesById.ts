@@ -37,7 +37,7 @@ export default async function getArticleById(
 
     return {
       ...article,
-      datePublished: article.datePublished.toISOString(),
+      datePublished: article.datePublished?.toISOString(),
       userId: article.userId || null,
       user: article.user
         ? {

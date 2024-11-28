@@ -13,10 +13,11 @@ interface Article {
   category: string;
   title: string;
   author: string;
-  datePublished: string;
+  datePublished: string | null;
   minutesRead: number;
   content: string;
   references: string;
+  status: string;
 }
 
 const queryClient = new QueryClient();

@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
-import Container from "@/app/components/Container";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { MdArrowOutward } from "react-icons/md";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import { IoMdEyeOff } from "react-icons/io";
+import { CgPen } from "react-icons/cg";
+import Modal from "@/app/components/Modals/Modal"; // Assuming you already have a Modal component
+import toast from "react-hot-toast";
 
 interface Article {
   id: string;
@@ -10,123 +13,233 @@ interface Article {
   title: string;
   minutesRead: number;
   content: string;
+  status: string; // Now this field will be used for publishing/unpublishing logic
 }
 
 export const dynamic = "force-dynamic";
 
-// Function to extract the first N words from content and add line breaks
-const getPreviewText = (
-  text: string,
-  wordLimit: number = 25,
-  wordsPerLine: number = 10
-) => {
+const getPreviewText = (text: string, wordLimit: number = 25) => {
   let cleanedText = text.trim().replace(/<p\s*>\s*<\/p>/g, "");
   const words = cleanedText.split(" ").slice(0, wordLimit);
-  const lines = [];
-  for (let i = 0; i < words.length; i += wordsPerLine) {
-    lines.push(words.slice(i, i + wordsPerLine).join(" "));
-  }
-  return lines.join("<br>") + (words.length >= wordLimit ? "..." : "");
+  return words.join(" ") + (words.length >= wordLimit ? "..." : "");
 };
 
 const AuthorCard: React.FC<{ article: Article }> = ({ article }) => {
-  const [isMobile, setIsMobile] = useState(false);
   const [watermarkVisible, setWatermarkVisible] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false); // To control modal visibility
+  const [isLoading, setIsLoading] = useState(false); // To handle loading state
+  const [unpublishModalOpen, setUnpublishModalOpen] = useState(false); // Modal state for unpublishing
+  const [publishModalOpen, setPublishModalOpen] = useState(false); // Modal state for publishing
 
   useEffect(() => {
-    const disableCopy = (e: ClipboardEvent) => e.preventDefault();
-    const disableKeyboardShortcuts = (e: KeyboardEvent) => {
-      if (
-        ((e.ctrlKey || e.metaKey) && ["c", "p", "s"].includes(e.key)) ||
-        e.ctrlKey ||
-        (e.metaKey && e.shiftKey && ["I", "J"].includes(e.key)) ||
-        e.key === "F12"
-      ) {
-        e.preventDefault();
-        alert("Subscribe - this is membership only");
-      }
-    };
-
-    const disableRightClick = (e: MouseEvent) => {
-      e.preventDefault();
-      alert("Subscribe - this is membership only");
-    };
-
-    const detectDevTools = () => {
-      if (
-        window.outerWidth - window.innerWidth > 160 ||
-        window.outerHeight - window.innerHeight > 160
-      ) {
-        alert("Developer Tools is not allowed!");
-      }
-    };
-
-    const disableLongPress = (e: TouchEvent) => {
-      e.preventDefault();
-    };
-
     const handlePrintScreen = (e: KeyboardEvent) => {
       if (e.key === "PrintScreen") {
         setWatermarkVisible(true);
-        alert("Screenshots are restricted by policy.");
+        toast.error("Screenshots are restricted by policy."); // Toast notification
       }
     };
 
-    setIsMobile(window.innerWidth < 768);
-
-    if (!isMobile) {
-      document.addEventListener("copy", disableCopy);
-      document.addEventListener("keydown", disableKeyboardShortcuts);
-      document.addEventListener("contextmenu", disableRightClick);
-      window.addEventListener("resize", detectDevTools);
-      document.addEventListener("touchstart", disableLongPress);
-      document.addEventListener("touchend", disableLongPress);
-      document.addEventListener("keydown", handlePrintScreen);
-    }
-
+    document.addEventListener("keydown", handlePrintScreen);
     return () => {
-      document.removeEventListener("copy", disableCopy);
-      document.removeEventListener("keydown", disableKeyboardShortcuts);
-      document.removeEventListener("contextmenu", disableRightClick);
-      window.removeEventListener("resize", detectDevTools);
-      document.removeEventListener("touchstart", disableLongPress);
-      document.removeEventListener("touchend", disableLongPress);
       document.removeEventListener("keydown", handlePrintScreen);
     };
-  }, [isMobile]);
+  }, []);
 
   const previewContent = getPreviewText(article.content);
 
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent the navigation
+    setModalOpen(true); // Show the modal on delete click
+  };
+
+  const handleUnpublishClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent the default behavior
+    setUnpublishModalOpen(true); // Show the unpublish modal
+  };
+
+  const handlePublishClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent the default behavior
+    setPublishModalOpen(true); // Show the publish modal
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false); // Close delete modal
+    setUnpublishModalOpen(false); // Close unpublish modal
+    setPublishModalOpen(false); // Close publish modal
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/deleteArticle", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: article.id }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        toast.error(
+          data.error || "An error occurred while deleting the article"
+        );
+      } else {
+        toast.success("Article deleted successfully");
+        window.location.reload();
+      }
+    } catch (error) {
+      toast.error("An error occurred while deleting the article");
+    } finally {
+      setIsLoading(false);
+      setModalOpen(false);
+    }
+  };
+
+  const handleUnpublishArticle = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/unpublishArticle", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ articleId: article.id }), // Sending the article ID
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        toast.error(
+          data.error || "An error occurred while unpublishing the article"
+        );
+      } else {
+        toast.success("Article unpublished successfully");
+        window.location.reload();
+      }
+    } catch (error) {
+      toast.error("An error occurred while unpublishing the article");
+    } finally {
+      setIsLoading(false);
+      setUnpublishModalOpen(false); // Close the modal after unpublishing
+    }
+  };
+
+  const handlePublishArticle = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/publishArticle", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ articleId: article.id }), // Sending the article ID
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        toast.error(
+          data.error || "An error occurred while publishing the article"
+        );
+      } else {
+        toast.success("Article published successfully");
+        window.location.reload();
+      }
+    } catch (error) {
+      toast.error("An error occurred while publishing the article");
+    } finally {
+      setIsLoading(false);
+      setPublishModalOpen(false); // Close the modal after publishing
+    }
+  };
+
   return (
-    <Link href={`/Article/${article.id}`} passHref>
-      <div className="cursor-pointer flex-col items-center relative">
-        <div
-          className={`watermark-overlay ${watermarkVisible ? "visible" : ""}`}
-        >
-          Confidential
-        </div>
+    <>
+      <div className="cursor-pointer flex flex-col bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-200 relative w-[400px] h-[550px]">
         <img
           src={article.picture}
           alt={article.title}
-          className="w-full h-[300px] translate-x-3 mb-3 rounded-md"
+          className="w-full h-[250px] object-cover"
         />
-        <div className="flex gap-x-2 text-black justify-between rounded-full p-3 w-auto mb-3">
-          <h1 className="text-[#ffff] bg-black rounded-full font-bold px-2">
-            {article.category}
-          </h1>
-          <h1>{article.minutesRead} min read</h1>
+        <div className="px-4 py-3 flex flex-col flex-grow">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-white bg-black rounded-full px-3 py-1">
+              {article.category}
+            </span>
+            <span className="text-sm text-gray-500">
+              {article.minutesRead} min read
+            </span>
+          </div>
+          <h2 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+            {article.title}
+          </h2>
+          <div
+            className="text-sm text-gray-600 mb-4 overflow-hidden line-clamp-3"
+            dangerouslySetInnerHTML={{ __html: article.content }}
+          ></div>
+          <div className="flex justify-between space-x-2 mt-auto">
+            <Link
+              href={`/AuthorDashboard/editArticle/${article.id}`}
+              className="flex items-center justify-center px-4 py-2 bg-black text-white rounded-md hover:bg-blue-700 transition"
+            >
+              <CgPen className="mr-2" />
+              Edit
+            </Link>
+            <button
+              onClick={
+                article.status === "PUBLISHED"
+                  ? handleUnpublishClick
+                  : handlePublishClick
+              } // Toggle between unpublish and publish
+              className="flex items-center justify-center px-4 py-2 bg-black text-white rounded-md hover:bg-yellow-600 transition"
+            >
+              <IoMdEyeOff className="mr-2" />
+              {article.status === "PUBLISHED" ? "Unpublish" : "Publish"}
+              {/* Toggle the button text based on status */}
+            </button>
+            <button
+              onClick={handleDeleteClick} // Trigger modal when clicked
+              className="flex items-center justify-center px-4 py-2 bg-black text-white rounded-md hover:bg-red-700 transition"
+            >
+              <MdOutlineDeleteOutline className="mr-2" />
+              Delete
+            </button>
+          </div>
         </div>
-        <h1 className="text-lg font-bold">{article.title}</h1>
-        <p
-          className="my-3"
-          dangerouslySetInnerHTML={{ __html: previewContent }}
-        ></p>
-        <button className="rounded-lg bg-black gap-x-1 text-white p-3 flex flex-row justify-center items-center">
-          Read more
-          <MdArrowOutward />
-        </button>
       </div>
-    </Link>
+
+      {/* Modal for confirming delete */}
+      <Modal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleConfirmDelete}
+        title="Confirm Deletion"
+        paragraph="Are you sure you want to delete this article?"
+        actionLabel="Delete"
+        isLoading={isLoading}
+      />
+
+      {/* Modal for unpublishing */}
+      <Modal
+        isOpen={unpublishModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleUnpublishArticle}
+        title="Confirm Unpublish"
+        paragraph="Are you sure you want to unpublish this article?"
+        actionLabel="Unpublish"
+        isLoading={isLoading}
+      />
+
+      {/* Modal for publishing */}
+      <Modal
+        isOpen={publishModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handlePublishArticle}
+        title="Confirm Publish"
+        paragraph="Are you sure you want to publish this article?"
+        actionLabel="Publish"
+        isLoading={isLoading}
+      />
+    </>
   );
 };
 

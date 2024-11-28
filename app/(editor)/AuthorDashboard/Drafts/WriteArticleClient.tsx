@@ -62,7 +62,7 @@ const ArticleForm = ({ article }: { article: any }) => {
 
     try {
       await axios.put(`/api/editArticle`, updatedArticleData); // Use PUT for updating
-      toast.success("Article updated successfully!");
+      toast.success("Article created successfully!");
     } catch (error) {
       console.error("Error updating article:", error);
       toast.error("Something went wrong while updating the article.");
@@ -81,7 +81,9 @@ const ArticleForm = ({ article }: { article: any }) => {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-4 max-w-[1000px]"
       >
-        <h1 className="mx-auto font-bold text-4xl my-5">Edit Article</h1>
+        <h1 className="mx-auto font-bold text-4xl my-5">
+          Continue Writing Article
+        </h1>
 
         <div className="flex items-center justify-center ">
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
