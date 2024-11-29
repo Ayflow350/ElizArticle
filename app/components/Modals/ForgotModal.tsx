@@ -1,10 +1,9 @@
 "use client";
 
-import axios from "axios";
-
+import axios from "axios"; // For API calls
 import { useState } from "react";
 import Input from "../inputs/input";
-import toast, { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast"; // For notifications
 import Button from "../Button";
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -13,13 +12,8 @@ import useForgotModal from "@/app/hooks/useForgotModal";
 import useVerifyModal from "@/app/hooks/useVerifyModal";
 import Modal from "./Modal";
 
-import { useRouter } from "next/navigation";
-
-const LoginModal = () => {
-  const router = useRouter();
-
+const ForgotModal = () => {
   const forgotModal = useForgotModal();
-
   const verifyModal = useVerifyModal();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,19 +24,36 @@ const LoginModal = () => {
   } = useForm<FieldValues>({
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  const handleVerifyModal = () => {
+  const handleVerifyModal = (email: string) => {
     forgotModal.onClose();
-    verifyModal.onOpen();
+    verifyModal.onOpen(email); // Pass the email to VerifyModal
   };
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
 
-    console.log(data); // This will log the data submitted by the user
+    try {
+      // Make API call to send reset code
+      const response = await axios.post("/api/forgotPassword", {
+        email: data.email,
+      });
+
+      // Notify success
+      toast.success(response.data.message);
+
+      // Open the Verify Modal with email
+      handleVerifyModal(data.email);
+    } catch (error: any) {
+      // Notify failure
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const bodyContent = (
@@ -58,33 +69,22 @@ const LoginModal = () => {
     </div>
   );
 
-  const footer = (
-    <div className="flex flex-col   gap-4">
-      <div className="flex justify-end mt-2 ">
-        <button
-          type="button"
-          onClick={handleVerifyModal}
-          className="text-black-500 text-base font-medium "
-        >
-          Verify the code
-        </button>
-      </div>
-    </div>
-  );
-
   return (
-    <Modal
-      title="Reset your password"
-      paragraph="We’ll email you a secure link to reset the password for your account."
-      disabled={isLoading}
-      isOpen={forgotModal.isOpen}
-      onClose={forgotModal.onClose}
-      onSubmit={handleSubmit(onSubmit)}
-      actionLabel="Get code"
-      body={bodyContent}
-      footer={footer}
-    />
+    <>
+      <Toaster /> {/* Notification Component */}
+      <Modal
+        title="Reset your password"
+        paragraph="We’ll email you an OTP to reset the password for your account."
+        disabled={isLoading}
+        isOpen={forgotModal.isOpen}
+        onClose={forgotModal.onClose}
+        onSubmit={handleSubmit(onSubmit)}
+        actionLabel="Get code"
+        body={bodyContent}
+        isLoading={isLoading}
+      />
+    </>
   );
 };
 
-export default LoginModal;
+export default ForgotModal;

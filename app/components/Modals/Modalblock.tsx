@@ -36,7 +36,6 @@ const ModalBlock = () => {
 
   const handleVerifyModal = () => {
     modalBlock.onClose();
-    verifyModal.onOpen();
   };
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {

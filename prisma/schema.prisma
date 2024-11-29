@@ -27,28 +27,33 @@ enum Role {
   ADMIN
 }
 model User {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  name            String?
-  email           String    @unique
-  emailVerified   DateTime?
-  image           String?
-  hashedPassword  String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  favouriteIds    String[]  @db.ObjectId
-  role            Role      @default(USER)
-  hasActiveSubscription Boolean @default(false) // New field to indicate active subscription status
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                   String?
+  email                  String    @unique
+  emailVerified          DateTime?
+  image                  String?
+  hashedPassword         String?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  favouriteIds           String[]  @db.ObjectId
+  role                   Role      @default(USER)
+  hasActiveSubscription  Boolean   @default(false) // Indicates active subscription status
+
+  // Password reset fields
+  resetCode              String?   // Stores the 4-digit reset code
+  resetCodeExpiration    DateTime? // Expiration time for the reset code
 
   // Relations
-  accounts        Account[]
-  articles        Article[] @relation("UserArticles")
-  subscriptions   Subscription[]
-  invoices        Invoice[]
-  bookmarks       Bookmark[]
-  readingProgress ReadingProgress[]
-  emailLogs       EmailNotification[]
-  analytics       Analytics[]
+  accounts               Account[]
+  articles               Article[] @relation("UserArticles")
+  subscriptions          Subscription[]
+  invoices               Invoice[]
+  bookmarks              Bookmark[]
+  readingProgress        ReadingProgress[]
+  emailLogs              EmailNotification[]
+  analytics              Analytics[]
 }
+
 
 
 model Account {

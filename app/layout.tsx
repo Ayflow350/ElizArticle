@@ -8,6 +8,7 @@ import Header from "@/app/components/Header";
 import LoginModal from "./components/Modals/LoginModal";
 import ForgotModal from "./components/Modals/ForgotModal";
 import VerifyModal from "./components/Modals/VerifyModal";
+import ForgotPasswordModal from "./components/Modals/PasswordResetModal";
 import ToasterProvider from "./providers/ToastProvider";
 import getCurrentUser from "./actions/getCurrentUser";
 
@@ -56,6 +57,7 @@ export default async function RootLayout({
         <LoginModal />
         <ForgotModal />
         <VerifyModal />
+        <ForgotPasswordModal />
         <Header currentUser={currentUser} />
         <ClientPayPalProvider>{children}</ClientPayPalProvider>
         {/* <Footer /> */}

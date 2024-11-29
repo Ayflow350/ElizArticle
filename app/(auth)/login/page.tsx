@@ -7,7 +7,8 @@ import Banner from "@/assets/banner.png";
 import Google from "@/assets/google.svg";
 import Container from "@/app/components/Container";
 import { useCallback, useState } from "react";
-import useLoginModal from "@/app/hooks/useLoginModal";
+
+import useForgotModal from "@/app/hooks/useForgotModal";
 import Input from "../../components/inputs/input";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ScaleLoader } from "react-spinners"; // Import ScaleLoader
@@ -19,7 +20,7 @@ export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 const SignUp = () => {
-  const loginModal = useLoginModal();
+  const forgotModal = useForgotModal();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -33,6 +34,10 @@ const SignUp = () => {
       password: "",
     },
   });
+
+  const handleForgotPassword = () => {
+    forgotModal.onOpen();
+  };
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
@@ -45,7 +50,6 @@ const SignUp = () => {
       if (callback?.ok) {
         toast.success("Logged in");
         router.push("/Account");
-        loginModal.onClose();
       }
       if (callback?.error) {
         toast.error(callback.error);
@@ -67,10 +71,7 @@ const SignUp = () => {
           <h2 className="text-[#666666] font-normal text-[20px]">
             The subscription is a fee of 12€/month
           </h2>
-          <button
-            onClick={loginModal.onOpen}
-            className="bg-white rounded-full border mt-8 mb-3 flex border-black gap-x-4 px-20 py-4"
-          >
+          <button className="bg-white rounded-full border mt-8 mb-3 flex border-black gap-x-4 px-20 py-4">
             <Image src={Google} alt="google-button" />
             <span className="font-extrabold bg-white">Login with Google</span>
           </button>
@@ -99,8 +100,9 @@ const SignUp = () => {
               required
             />
             <div className="flex flex-row items-center gap-x-2 text-left">
-              <input type="checkbox" />
-              <h1>I agree to all Terms & Privacy Policy</h1>
+              <button onClick={handleForgotPassword}>
+                Forgot your Password?
+              </button>
             </div>
           </div>
           <button

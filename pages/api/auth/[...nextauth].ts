@@ -21,8 +21,8 @@ export const authOptions: AuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: { label: "email", type: "text" },
-        password: { label: "password", type: "password" },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -46,14 +46,13 @@ export const authOptions: AuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        // Return a user object that matches the expected User type
         return {
           id: user.id,
           email: user.email,
-          name: user.name || "", // Ensure name is a string
-          role: (user.role as "USER" | "ADMIN") || "USER", // Map role
+          name: user.name || "",
+          role: (user.role as "USER" | "ADMIN") || "USER",
           hasActiveSubscription: user.hasActiveSubscription ?? false,
-          emailVerified: user.emailVerified, // Ensure all required fields are included
+          emailVerified: user.emailVerified,
           image: user.image,
         };
       },
@@ -61,16 +60,38 @@ export const authOptions: AuthOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: 5 * 60, // Session expires after 30 minutes (in seconds)
+  },
+  jwt: {
+    maxAge: 5 * 60, // JWT token expires after 30 minutes (in seconds)
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        // Set token data based on user information
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.role = user.role;
-        token.hasActiveSubscription = user.hasActiveSubscription;
+        token.role = user.role || "USER";
+        token.hasActiveSubscription = user.hasActiveSubscription ?? false;
+
+        // Set token expiration to 30 minutes from the current time (in seconds)
+        token.exp = Math.floor(Date.now() / 1000) + 5 * 60; // 30 minutes
       }
+
+      // Calculate the time left based on the token expiration time
+      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+      const timeLeft = token.exp ? Number(token.exp) - currentTime : 0;
+
+      // Log token data and time left
+      console.log("JWT Callback:");
+      console.log("Token Data:", token);
+      console.log(
+        timeLeft > 0
+          ? `Time Left: ${timeLeft} seconds`
+          : "Token has already expired."
+      );
+
       return token;
     },
     async session({ session, token }) {
@@ -82,12 +103,29 @@ export const authOptions: AuthOptions = {
           role: token.role as "USER" | "ADMIN",
           hasActiveSubscription: token.hasActiveSubscription as boolean,
         };
+
+        // Get the current time in seconds
+        const currentTime = Math.floor(Date.now() / 1000);
+
+        // Get expiration time from session (in seconds)
+        const expirationTime = new Date(session.expires).getTime() / 1000;
+
+        // Calculate time left
+        const timeLeft = expirationTime - currentTime;
+
+        console.log("Session Callback:");
+        console.log("Session Data:", session);
+        console.log(
+          timeLeft > 0
+            ? `Time Left: ${timeLeft} seconds`
+            : "Session has already expired."
+        );
       }
       return session;
     },
   },
   pages: {
-    signIn: "/",
+    signIn: "/login",
   },
   debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
