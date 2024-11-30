@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, QueryClient, QueryClientProvider } from "react-query";
 import Container from "@/app/components/Container";
 import AuthorCard from "./AuthorCard";
@@ -30,72 +30,60 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
   articles,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string>("all"); // Added state for filter
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const articlesPerPage = 9;
 
-  // React Query to handle filtered articles
-  const { data: filteredArticles } = useQuery(
-    ["filteredArticles", statusFilter, articles],
-    () => {
-      let currentArticles = articles;
+  useEffect(() => {
+    // Reset pagination when filter changes
+    setCurrentPage(1);
+  }, [statusFilter]);
 
-      // Filtering articles based on the status selected
+  // Filter and paginate articles
+  const { data: filteredArticles } = useQuery(
+    ["filteredArticles", statusFilter, currentPage],
+    () => {
+      let filtered = articles;
+
+      // Apply status filter
       if (statusFilter !== "all") {
-        currentArticles = currentArticles.filter(
+        filtered = articles.filter(
           (article) => article.status === statusFilter
         );
       }
 
       // Pagination logic
-      const indexOfLastArticle = currentPage * articlesPerPage;
-      const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
-      return currentArticles.slice(indexOfFirstArticle, indexOfLastArticle);
+      const startIndex = (currentPage - 1) * articlesPerPage;
+      return filtered.slice(startIndex, startIndex + articlesPerPage);
     },
     {
-      keepPreviousData: true, // Keeps previous data while new data is loading
+      keepPreviousData: true,
     }
   );
 
-  const totalPages = Math.ceil(articles.length / articlesPerPage);
+  // Calculate total pages for the filtered list
+  const totalFilteredArticles =
+    statusFilter === "all"
+      ? articles.length
+      : articles.filter((article) => article.status === statusFilter).length;
+  const totalPages = Math.ceil(totalFilteredArticles / articlesPerPage);
 
   return (
     <Container>
       {/* Filter Tabs */}
       <div className="flex justify-center space-x-4 mb-4">
-        <button
-          className={`px-4 py-2 rounded ${
-            statusFilter === "all" ? "bg-black text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setStatusFilter("all")}
-        >
-          All
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${
-            statusFilter === "PUBLISHED" ? "bg-black text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setStatusFilter("PUBLISHED")}
-        >
-          Published
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${
-            statusFilter === "UNPUBLISHED"
-              ? "bg-black text-white"
-              : "bg-gray-200"
-          }`}
-          onClick={() => setStatusFilter("UNPUBLISHED")}
-        >
-          Unpublished
-        </button>
-        <button
-          className={`px-4 py-2 rounded ${
-            statusFilter === "DRAFT" ? "bg-black text-white" : "bg-gray-200"
-          }`}
-          onClick={() => setStatusFilter("DRAFT")}
-        >
-          Draft
-        </button>
+        {["all", "PUBLISHED", "UNPUBLISHED", "DRAFT"].map((status) => (
+          <button
+            key={status}
+            className={`px-4 py-2 rounded ${
+              statusFilter === status ? "bg-black text-white" : "bg-gray-200"
+            }`}
+            onClick={() => setStatusFilter(status)}
+          >
+            {status === "all"
+              ? "All"
+              : status.charAt(0) + status.slice(1).toLowerCase()}
+          </button>
+        ))}
       </div>
 
       <div className="flex justify-center items-center p-4">
@@ -107,47 +95,49 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-center items-center mt-10 space-x-2">
-        {/* Previous Button */}
-        <button
-          className={`px-4 py-2 border rounded flex gap-x-2 items-center ${
-            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-10 space-x-2">
+          {/* Previous Button */}
+          <button
+            className={`px-4 py-2 border rounded flex gap-x-2 items-center ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
 
-        {/* Page Numbers */}
-        {[...Array(totalPages)].map((_, index) => {
-          const pageNumber = index + 1;
-          return (
-            <button
-              key={pageNumber}
-              className={`px-4 py-2 border rounded ${
-                currentPage === pageNumber ? "bg-black text-white" : ""
-              }`}
-              onClick={() => setCurrentPage(pageNumber)}
-            >
-              {pageNumber}
-            </button>
-          );
-        })}
+          {/* Page Numbers */}
+          {[...Array(totalPages)].map((_, index) => {
+            const pageNumber = index + 1;
+            return (
+              <button
+                key={pageNumber}
+                className={`px-4 py-2 border rounded ${
+                  currentPage === pageNumber ? "bg-black text-white" : ""
+                }`}
+                onClick={() => setCurrentPage(pageNumber)}
+              >
+                {pageNumber}
+              </button>
+            );
+          })}
 
-        {/* Next Button */}
-        <button
-          className={`px-4 py-2 border text-black rounded flex gap-x-2 items-center ${
-            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+          {/* Next Button */}
+          <button
+            className={`px-4 py-2 border rounded flex gap-x-2 items-center ${
+              currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </Container>
   );
 };
