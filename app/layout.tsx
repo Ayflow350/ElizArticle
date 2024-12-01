@@ -13,7 +13,6 @@ import ToasterProvider from "./providers/ToastProvider";
 import getCurrentUser from "./actions/getCurrentUser";
 
 import ClientPayPalProvider from "@/app/providers/ClientPayPalProvider";
-import Footer from "./components/Footer";
 
 // Import Satoshi as a local font
 const satoshi = localFont({

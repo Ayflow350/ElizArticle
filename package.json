@@ -17,20 +17,12 @@
     "@paypal/react-paypal-js": "^8.6.0",
     "@prisma/client": "^5.21.1",
     "@tanstack/react-query": "^5.60.5",
-    "@tiptap/extension-color": "^2.9.1",
-    "@tiptap/extension-task-item": "^2.9.1",
-    "@tiptap/extension-task-list": "^2.9.1",
-    "@tiptap/extension-text-style": "^2.9.1",
-    "@tiptap/react": "^2.9.1",
-    "@tiptap/starter-kit": "^2.9.1",
     "@types/dompurify": "^3.0.5",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "chart.js": "^4.4.6",
     "dompurify": "^3.1.7",
     "dotenv": "^16.4.5",
-    "ioredis": "^5.4.1",
-    "loadash": "^1.0.0",
     "morgan": "^1.10.0",
     "next": "15.0.2",
     "next-auth": "^4.24.10",
@@ -49,7 +41,6 @@
     "react-query": "^3.39.3",
     "react-quill-new": "^3.3.3",
     "react-spinners": "^0.14.1",
-    "secure-web": "^1.2.4",
     "tailwind-merge": "^2.5.4",
     "zustand": "^5.0.1"
   },
@@ -65,8 +56,5 @@
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
-  },
-  "prisma": {
-    "seed": "ts-node --transpile-only prisma/seed.ts"
   }
 }
