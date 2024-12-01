@@ -8,7 +8,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Public routes that don't require authentication
-  const publicRoutes = ["/login", "/signup"];
+  const publicRoutes = ["/signup", "/login"];
 
   // Check if the current route is public
   const isPublicRoute = publicRoutes.some((route) =>
@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
 
   // Redirect unauthenticated users trying to access protected routes
   if (!token && !isPublicRoute) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   // If user is authenticated, extract details
@@ -27,13 +27,13 @@ export async function middleware(req: NextRequest) {
   };
 
   // Redirect authenticated users away from signup
-  if (pathname === "/login" && token) {
+  if (pathname === "/signup" && token) {
     if (user.role === "ADMIN") {
       return NextResponse.redirect(
         new URL("/AuthorDashboard/Article", req.url)
       );
     }
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   // Restrict access to article pages for unsubscribed users
@@ -43,7 +43,7 @@ export async function middleware(req: NextRequest) {
 
   // Restrict access to AuthorDashboard for non-admin users
   if (pathname.startsWith("/AuthorDashboard") && user?.role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   // Allow all other cases to proceed

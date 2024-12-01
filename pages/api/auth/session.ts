@@ -1,4 +1,4 @@
-import { getSession, signOut } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import { NextApiRequest, NextApiResponse } from "next";
 import morganMiddleware from "@/app/libs/morgan"; // Adjust the path as needed
 
@@ -18,15 +18,6 @@ export default async function handler(
   if (!session) {
     console.log("[API Response] User not authenticated");
     return res.status(401).json({ message: "Not authenticated" });
-  }
-
-  // Check if the session is expired
-  if (session.expires && new Date(session.expires) < new Date()) {
-    console.log("[API Response] Session expired. Signing user out.");
-    await signOut({ callbackUrl: "/login" }); // Redirect user to the home page
-    return res
-      .status(401)
-      .json({ message: "Session expired. Please log in again." });
   }
 
   const { hasActiveSubscription, role } = session.user as {
