@@ -67,11 +67,11 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
   return (
     <Container>
       {/* Category Tabs */}
-      <div className="flex justify-center items-center mb-6  border-gray-300">
+      <div className="flex justify-center items-center mb-6 border-gray-300 overflow-x-auto whitespace-nowrap">
         {categories.map((category) => (
           <button
             key={category}
-            className={`px-6 py-2 text-lg font-semibold border-b-2 ${
+            className={`px-6 py-2 text-sm lg:text-lg font-semibold border-b-2 ${
               selectedCategory === category
                 ? "border-black text-white hover:text-white bg-black rounded-full"
                 : "border-transparent hover:text-black text-gray-600"

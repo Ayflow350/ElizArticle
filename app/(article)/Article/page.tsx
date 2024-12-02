@@ -24,7 +24,7 @@ const ArticlesPage = async () => {
     return (
       <div className="mt-[30px]">
         <div className=" space-y-5 mb-20">
-          <h1 className=" text-center font-bold border-t border-b  bg-black text-white text-[160px] ">
+          <h1 className=" text-center font-bold border-t border-b  bg-black text-white text-[70px] lg:text-[160px] ">
             THE RESEARCH
           </h1>
           <Container>
