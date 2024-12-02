@@ -52,6 +52,7 @@ const LoginModal = () => {
       if (callback?.ok) {
         toast.success("Logged in");
         router.push("/Account");
+        window.location.href = "/Account";
         loginModal.onClose();
       }
       if (callback?.error) {

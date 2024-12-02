@@ -27,14 +27,6 @@ export async function middleware(req: NextRequest) {
   };
 
   // Redirect authenticated users away from signup
-  if (pathname === "/signup" && token) {
-    if (user.role === "ADMIN") {
-      return NextResponse.redirect(
-        new URL("/AuthorDashboard/Article", req.url)
-      );
-    }
-    return NextResponse.redirect(new URL("/", req.url));
-  }
 
   // Restrict access to article pages for unsubscribed users
   if (pathname.startsWith("/Article") && !user?.hasActiveSubscription) {

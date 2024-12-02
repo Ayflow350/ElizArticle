@@ -14,15 +14,18 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { ScaleLoader } from "react-spinners"; // Import ScaleLoader
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
+import useUserStore from "@/stores/userStore";
+import getCurrentUser from "@/app/actions/getCurrentUser";
 
 const SignUp = () => {
   const forgotModal = useForgotModal();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const {
     register,
@@ -38,25 +41,29 @@ const SignUp = () => {
   const handleForgotPassword = () => {
     forgotModal.onOpen();
   };
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
 
-    signIn("credentials", {
+    const callback = await signIn("credentials", {
       ...data,
       redirect: false,
-    }).then((callback) => {
-      setIsLoading(false);
-
-      if (callback?.ok) {
-        toast.success("Logged in");
-        router.push("/Account");
-      }
-      if (callback?.error) {
-        toast.error(callback.error);
-      }
     });
-  };
 
+    setIsLoading(false);
+
+    if (callback?.ok) {
+      toast.success("Logged in");
+
+      // Navigate to the `/Account` page
+      router.push("/Account");
+      window.location.href = "/Account"; // Reload the login page
+    }
+
+    if (callback?.error) {
+      toast.error(callback.error);
+    }
+  };
   return (
     <Container>
       <div className="flex justify-center items-center  md:justify-between mt-3 pt-2 md:pt-5 px-4">
@@ -106,6 +113,7 @@ const SignUp = () => {
             </div>
           </div>
           <button
+            type="submit"
             onClick={handleSubmit(onSubmit)}
             className="rounded-full mx-auto border mt-8  w-[300px] md:w-[400px] text-center mb-3 flex justify-center items-center border-black bg-black text-white px-10 py-4 self-center"
             disabled={isLoading}

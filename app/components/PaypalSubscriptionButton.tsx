@@ -4,6 +4,7 @@ import React from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import toast from "react-hot-toast";
 import { useMutation, useQueryClient } from "react-query"; // Import useMutation and useQueryClient
+import { useRouter } from "next/navigation";
 
 // Define the interface for the subscription response
 interface PaypalSubscriptionButtonProps {
@@ -26,7 +27,7 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
   planId,
 }) => {
   const queryClient = useQueryClient(); // Initialize queryClient to manage the cache
-  const clientId = process.env.PAYPAL_CLIENT_ID;
+  const router = useRouter();
   // Define the mutation to send subscription details to the server
   const { mutate: sendSubscriptionDetailsToServer, isLoading: isSubmitting } =
     useMutation(
@@ -86,6 +87,7 @@ const PaypalSubscriptionButton: React.FC<PaypalSubscriptionButtonProps> = ({
       sendSubscriptionDetailsToServer(details);
 
       // Show success message and redirect
+      router.refresh();
       toast.success("Subscription successful! Redirecting...");
       setTimeout(() => {
         window.location.href = "/Payments";

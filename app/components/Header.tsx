@@ -41,11 +41,12 @@ const Header: React.FC<HeaderProps> = ({ currentUser }) => {
   const handleLogout = useCallback(() => {
     signOut({ redirect: false })
       .then(() => {
-        // Clear currentUser data locally
-        currentUser = null; // Ensure dropdown closes immediately
         toast.success("You have been signed out.");
-        closeDropdown(); // Close dropdown after logout
+
         router.push("/login");
+        window.location.href = "/login"; // Reload the login page
+        closeDropdown();
+        // Close dropdown after logout
       })
       .catch(() => {
         toast.error("Something went wrong. Please try again.");

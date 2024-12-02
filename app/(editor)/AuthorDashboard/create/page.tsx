@@ -63,6 +63,7 @@ const ArticleForm = () => {
       toast.success("Article posted successfully!");
 
       // Navigate to the new article page
+      router.refresh();
       router.push(`/AuthorDashboard/PublishArticle/Article/${id}`);
     } catch (error) {
       console.error("Error uploading article:", error);
