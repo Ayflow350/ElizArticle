@@ -32,7 +32,7 @@ const ArticlesPage = async () => {
               Articles on optimizing thyroid, adrenal, and steroid hormone
               functions
             </h1>
-            <p className=" text-left text-lg text-gray-600 px-3 indent-8 mb-4 ">
+            <p className=" text-left  text-[16px] lg:text-lg text-gray-600 px-3 indent-8 mb-4 ">
               I decided not to write the book on thyroid and adrenal function
               because too many people need the information now. I prefer writing
               to making videos, and this way, I can also include references.
@@ -42,7 +42,7 @@ const ArticlesPage = async () => {
               continuous learning process.
             </p>
 
-            <p className="text-gray-600 px-3 text-lg indent-8 ">
+            <p className="text-gray-600 text-[16px] px-3 lg:text-lg indent-8 ">
               The subject matter of the articles will be more varied than
               endocrinology, but it will also provide information on how to eat
               to optimize your health. Per my research, optimum health starts

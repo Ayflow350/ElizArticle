@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const hashedPassword = await bcrypt.hash(password, 12);
 
   let role: Role = Role.USER;
-  if (email === "admin@example.com") {
+  if (email === "eliz@elizbright.com") {
     role = Role.ADMIN;
   }
 

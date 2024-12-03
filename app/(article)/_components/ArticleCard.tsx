@@ -131,7 +131,7 @@ const AuthorCard: React.FC<{ article: Article }> = ({ article }) => {
 
         {/* Preview Content */}
         <p
-          className="text-lg text-gray-700  mb-4 line-clamp-4"
+          className=" text-sm lg:text-lg text-gray-700  mb-4 line-clamp-4"
           dangerouslySetInnerHTML={{ __html: previewContent }}
         ></p>
 
