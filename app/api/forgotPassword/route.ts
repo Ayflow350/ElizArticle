@@ -40,18 +40,22 @@ export async function POST(req: Request) {
       },
     });
 
-    // Configure nodemailer transporter
+    // Configure nodemailer transporter with Outlook OAuth2
     const transporter = nodemailer.createTransport({
-      service: "Gmail",
+      service: "Outlook365",
       auth: {
-        user: process.env.EMAIL_USER, // Gmail username
-        pass: process.env.EMAIL_PASSWORD, // Gmail password or app-specific password
+        type: "OAuth2",
+        user: process.env.OUTLOOK_EMAIL, // Your Outlook email address
+        clientId: process.env.OUTLOOK_CLIENT_ID, // Client ID from Azure
+        clientSecret: process.env.OUTLOOK_CLIENT_SECRET, // Client Secret from Azure
+        refreshToken: process.env.OUTLOOK_REFRESH_TOKEN, // Refresh token
+        accessToken: process.env.OUTLOOK_ACCESS_TOKEN, // Optional if you have a valid access token
       },
     });
 
     // Send the email with the six-digit code
     await transporter.sendMail({
-      from: `"Your App Name" <${process.env.EMAIL_USER}>`, // Sender address
+      from: `"Your App Name" <${process.env.OUTLOOK_EMAIL}>`, // Sender address
       to: email, // Recipient email
       subject: "Password Reset Code",
       html: `
@@ -78,3 +82,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

@@ -29,9 +29,9 @@ export async function middleware(req: NextRequest) {
   // Redirect authenticated users away from signup
 
   // Restrict access to article pages for unsubscribed users
-  if (pathname.startsWith("/Article") && !user?.hasActiveSubscription) {
-    return NextResponse.redirect(new URL("/Payment", req.url));
-  }
+  // if (pathname.startsWith("/Article") && !user?.hasActiveSubscription) {
+  //   return NextResponse.redirect(new URL("/Payment", req.url));
+  // }
 
   // Restrict access to AuthorDashboard for non-admin users
   if (pathname.startsWith("/AuthorDashboard") && user?.role !== "ADMIN") {
@@ -43,6 +43,9 @@ export async function middleware(req: NextRequest) {
 }
 
 // Define the paths the middleware should match
+// export const config = {
+//   matcher: ["/signup", "/Article/:path*", "/AuthorDashboard/:path*"], // Apply to these paths
+// };
 export const config = {
-  matcher: ["/signup", "/Article/:path*", "/AuthorDashboard/:path*"], // Apply to these paths
+  matcher: ["/signup", "/AuthorDashboard/:path*"], // Apply to these paths
 };
