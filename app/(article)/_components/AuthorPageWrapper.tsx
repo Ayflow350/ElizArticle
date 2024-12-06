@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useQuery, QueryClient, QueryClientProvider } from "react-query";
 import Container from "@/app/components/Container";
 import AuthorCard from "./AuthorCard";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -89,7 +90,9 @@ const AuthorPageWrapper: React.FC<ArticlesPageWrapperProps> = ({
       <div className="flex justify-center items-center p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredArticles?.map((article) => (
-            <AuthorCard key={article.id} article={article} />
+            <Link href={`/Article/${article.id}`} key={article.id}>
+              <AuthorCard key={article.id} article={article} />
+            </Link>
           ))}
         </div>
       </div>
