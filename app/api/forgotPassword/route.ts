@@ -1,7 +1,9 @@
+import React from "react";
+import { render } from "@react-email/render";
+import PasswordResetEmail from "@/app/components/EmailTemplate";
 import prisma from "@/app/libs/prismadb"; // Adjust the path as necessary
-import nodemailer from "nodemailer"; // For sending emails
+import nodemailer from "nodemailer";
 
-// Handle POST requests
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -40,31 +42,32 @@ export async function POST(req: Request) {
       },
     });
 
-    // Configure nodemailer transporter with Outlook OAuth2
+    // Render the email template using React.createElement
+    const emailHtml: string = await render(
+      React.createElement(PasswordResetEmail, {
+        resetCode,
+        userName: user.name || "User",
+        logoUrl:
+          "https://res.cloudinary.com/drczkfgqp/image/upload/v1733489142/modal-logo_tcqemt.png",
+        homePageUrl: "https://articles.elizbright.com/",
+      })
+    );
+
+    // Configure nodemailer transporter
     const transporter = nodemailer.createTransport({
-      service: "Outlook365",
+      service: "Gmail",
       auth: {
-        type: "OAuth2",
-        user: process.env.OUTLOOK_EMAIL, // Your Outlook email address
-        clientId: process.env.OUTLOOK_CLIENT_ID, // Client ID from Azure
-        clientSecret: process.env.OUTLOOK_CLIENT_SECRET, // Client Secret from Azure
-        refreshToken: process.env.OUTLOOK_REFRESH_TOKEN, // Refresh token
-        accessToken: process.env.OUTLOOK_ACCESS_TOKEN, // Optional if you have a valid access token
+        user: process.env.EMAIL_USER, // Gmail username
+        pass: process.env.EMAIL_PASSWORD, // Gmail password or app-specific password
       },
     });
 
-    // Send the email with the six-digit code
+    // Send the email with the reset code
     await transporter.sendMail({
-      from: `"Your App Name" <${process.env.OUTLOOK_EMAIL}>`, // Sender address
+      from: `"Ebright" <${process.env.EMAIL_USER}>`, // Sender address
       to: email, // Recipient email
       subject: "Password Reset Code",
-      html: `
-        <p>Hi ${user.name || "User"},</p>
-        <p>We received a request to reset your password. Use the code below to proceed:</p>
-        <h2>${resetCode}</h2>
-        <p>This code will expire in 1 hour. If you did not request a password reset, please ignore this email.</p>
-        <p>Thank you!</p>
-      `,
+      html: emailHtml, // React Email template rendered HTML
     });
 
     return new Response(
@@ -82,4 +85,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
